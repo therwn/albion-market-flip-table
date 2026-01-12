@@ -79,6 +79,11 @@ export interface ProfitCalculation {
   profit: number;
   profitMargin: number;
   quantity: number;
+  // Tax detayları
+  blackMarketTax?: number;
+  blackMarketSetupFee?: number;
+  buyOrderSetupFee?: number;
+  grossRevenue?: number;
 }
 
 export interface TimeRangeStatistics {

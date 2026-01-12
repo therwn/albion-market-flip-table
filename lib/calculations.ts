@@ -81,6 +81,17 @@ export function calculateItemProfit(
   const profit = blackMarketRevenue - totalCost;
   const profitMargin = totalCost > 0 ? (profit / totalCost) * 100 : 0;
   
+  // Buy order setup fee toplamını hesapla
+  let totalBuyOrderSetupFee = 0;
+  if (orderType === 'buy_order') {
+    item.cities.forEach((city: CityData) => {
+      if (city.buyPrice && city.buyQuantity) {
+        const baseCost = city.buyPrice * city.buyQuantity;
+        totalBuyOrderSetupFee += baseCost * SETUP_FEE;
+      }
+    });
+  }
+
   return {
     itemName: item.name,
     tier: item.tier,
@@ -90,6 +101,11 @@ export function calculateItemProfit(
     profit,
     profitMargin,
     quantity: totalQuantity,
+    // Tax detayları
+    blackMarketTax,
+    blackMarketSetupFee,
+    buyOrderSetupFee: totalBuyOrderSetupFee,
+    grossRevenue,
   };
 }
 
