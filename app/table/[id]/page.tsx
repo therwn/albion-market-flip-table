@@ -473,8 +473,8 @@ export default function TableDetailPage() {
                                   />
                                 </div>
                               )}
-                        <div className="grid grid-cols-3 gap-4">
-                          <div className="space-y-2">
+                              <div className="grid grid-cols-3 gap-4">
+                                <div className="space-y-2">
                             <Label>Alış Fiyatı</Label>
                             {isEditing ? (
                               <Input
@@ -495,10 +495,10 @@ export default function TableDetailPage() {
                                 {item.caerleonBlackMarket.buyPrice ? formatNumber(item.caerleonBlackMarket.buyPrice) : '0'}
                               </p>
                             )}
-                            <p className="text-xs text-muted-foreground">Black Market&apos;in aldığı fiyat</p>
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Alış Adedi</Label>
+                                <p className="text-xs text-muted-foreground">Black Market&apos;in aldığı fiyat</p>
+                              </div>
+                              <div className="space-y-2">
+                                <Label>Alış Adedi</Label>
                             {isEditing ? (
                               <Input
                                 value={item.caerleonBlackMarket.buyQuantity ? formatNumberInput(item.caerleonBlackMarket.buyQuantity.toString()) : ''}
@@ -513,15 +513,15 @@ export default function TableDetailPage() {
                                 }}
                                 placeholder="0"
                               />
-                            ) : (
-                              <p className="text-sm py-2">
-                                {item.caerleonBlackMarket.buyQuantity ? formatNumber(item.caerleonBlackMarket.buyQuantity) : '0'}
-                              </p>
-                            )}
-                            <p className="text-xs text-muted-foreground">Black Market&apos;in aldığı maksimum adet</p>
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Satış Adedi</Label>
+                              ) : (
+                                <p className="text-sm py-2">
+                                  {item.caerleonBlackMarket.buyQuantity ? formatNumber(item.caerleonBlackMarket.buyQuantity) : '0'}
+                                </p>
+                              )}
+                                <p className="text-xs text-muted-foreground">Black Market&apos;in aldığı maksimum adet</p>
+                              </div>
+                              <div className="space-y-2">
+                                <Label>Satış Adedi</Label>
                             {isEditing ? (
                               <Input
                                 value={item.caerleonBlackMarket.sellQuantity ? formatNumberInput(item.caerleonBlackMarket.sellQuantity.toString()) : ''}
@@ -536,21 +536,22 @@ export default function TableDetailPage() {
                                 }}
                                 placeholder="0"
                               />
-                            ) : (
-                              <p className="text-sm py-2">
-                                {item.caerleonBlackMarket.sellQuantity ? formatNumber(item.caerleonBlackMarket.sellQuantity) : '0'}
+                              ) : (
+                                <p className="text-sm py-2">
+                                  {item.caerleonBlackMarket.sellQuantity ? formatNumber(item.caerleonBlackMarket.sellQuantity) : '0'}
+                                </p>
+                              )}
+                                <p className="text-xs text-muted-foreground">Bizim Black Market&apos;e sattığımız adet</p>
+                              </div>
+                            </div>
+                            {isEditing && (
+                              <p className="text-xs text-muted-foreground">
+                                {item.caerleonBlackMarket.isSellOrder 
+                                  ? 'Sell Order: Premium Tax (%4/%8) + Setup Fee (%2.5) düşülecek'
+                                  : 'Direkt Sell: Sadece Premium Tax (%4/%8) düşülecek'}
                               </p>
                             )}
-                            <p className="text-xs text-muted-foreground">Bizim Black Market&apos;e sattığımız adet</p>
                           </div>
-                        </div>
-                        {isEditing && (
-                          <p className="text-xs text-muted-foreground">
-                            {item.caerleonBlackMarket.isSellOrder 
-                              ? 'Sell Order: Premium Tax (%4/%8) + Setup Fee (%2.5) düşülecek'
-                              : 'Direkt Sell: Sadece Premium Tax (%4/%8) düşülecek'}
-                          </p>
-                            </div>
                           </AccordionContent>
                         </AccordionItem>
                       </Accordion>
