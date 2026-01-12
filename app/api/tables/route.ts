@@ -3,6 +3,10 @@ import { supabase } from '@/lib/supabase';
 
 export async function GET() {
   try {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      return NextResponse.json([]);
+    }
+
     const { data, error } = await supabase
       .from('tables')
       .select('*')
@@ -21,6 +25,13 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      return NextResponse.json(
+        { error: 'Supabase not configured' },
+        { status: 500 }
+      );
+    }
+
     const body = await request.json();
     const { created_by, data, is_premium, order_type } = body;
 

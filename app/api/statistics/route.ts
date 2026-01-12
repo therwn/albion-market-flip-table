@@ -4,6 +4,15 @@ import { calculateTableStatistics } from '@/lib/calculations';
 
 export async function GET() {
   try {
+    // Check if Supabase is configured
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      return NextResponse.json({
+        mostSoldItems: [],
+        mostProfitableItems: [],
+        leastProfitableItems: [],
+      });
+    }
+
     // Get all tables
     const { data: tables, error } = await supabase
       .from('tables')

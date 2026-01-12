@@ -43,6 +43,7 @@ export default function TableDetailPage() {
       fetchTable();
       fetchVersions();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tableId]);
 
   const fetchTable = async () => {
