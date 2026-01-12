@@ -43,6 +43,7 @@ export default function CreateTablePage() {
       caerleonBlackMarket: {
         buyPrice: 0,
         buyQuantity: 0,
+        sellQuantity: 0,
       },
     };
     setItems([...items, newItem]);
@@ -352,7 +353,7 @@ export default function CreateTablePage() {
                           <Label className="text-base font-semibold block">
                             Caerleon Black Market
                           </Label>
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-3 gap-4">
                             <div className="space-y-2">
                               <Label>Alış Fiyatı</Label>
                               <Input
@@ -368,6 +369,7 @@ export default function CreateTablePage() {
                                 }}
                                 placeholder="0"
                               />
+                              <p className="text-xs text-muted-foreground">Black Market'in aldığı fiyat</p>
                             </div>
                             <div className="space-y-2">
                               <Label>Alış Adedi</Label>
@@ -384,6 +386,24 @@ export default function CreateTablePage() {
                                 }}
                                 placeholder="0"
                               />
+                              <p className="text-xs text-muted-foreground">Black Market'in aldığı maksimum adet</p>
+                            </div>
+                            <div className="space-y-2">
+                              <Label>Satış Adedi</Label>
+                              <Input
+                                value={item.caerleonBlackMarket.sellQuantity ? formatNumberInput(item.caerleonBlackMarket.sellQuantity.toString()) : ''}
+                                onChange={(e) => {
+                                  const value = parseFormattedNumber(e.target.value);
+                                  updateItem(item.id, {
+                                    caerleonBlackMarket: {
+                                      ...item.caerleonBlackMarket,
+                                      sellQuantity: Math.floor(value),
+                                    },
+                                  });
+                                }}
+                                placeholder="0"
+                              />
+                              <p className="text-xs text-muted-foreground">Bizim Black Market'e sattığımız adet</p>
                             </div>
                           </div>
                         </div>
@@ -443,7 +463,7 @@ export default function CreateTablePage() {
                                           {orderType === 'buy_order' ? (
                                             <>
                                               <div className="space-y-2">
-                                                <Label>Market Satış Fiyatı</Label>
+                                                <Label>Buy Order Fiyatı</Label>
                                                 <Input
                                                   value={cityData.buyPrice ? formatNumberInput(cityData.buyPrice.toString()) : ''}
                                                   onChange={(e) => updateCityData(
@@ -454,9 +474,10 @@ export default function CreateTablePage() {
                                                   )}
                                                   placeholder="0"
                                                 />
+                                                <p className="text-xs text-muted-foreground">Bizim buy order oluşturduğumuz ücret</p>
                                               </div>
                                               <div className="space-y-2">
-                                                <Label>Market Alış Adedi</Label>
+                                                <Label>Buy Order Adedi</Label>
                                                 <Input
                                                   value={cityData.buyQuantity ? formatNumberInput(cityData.buyQuantity.toString()) : ''}
                                                   onChange={(e) => updateCityData(
@@ -467,12 +488,13 @@ export default function CreateTablePage() {
                                                   )}
                                                   placeholder="0"
                                                 />
+                                                <p className="text-xs text-muted-foreground">Bizim satın almak için oluşturduğumuz toplam adet</p>
                                               </div>
                                             </>
                                           ) : (
                                             <>
                                               <div className="space-y-2">
-                                                <Label>Market Satış Fiyatı</Label>
+                                                <Label>Satış Fiyatı</Label>
                                                 <Input
                                                   value={cityData.sellPrice ? formatNumberInput(cityData.sellPrice.toString()) : ''}
                                                   onChange={(e) => updateCityData(
@@ -483,9 +505,10 @@ export default function CreateTablePage() {
                                                   )}
                                                   placeholder="0"
                                                 />
+                                                <p className="text-xs text-muted-foreground">Bizim satın aldığımız, Market'in sattığı fiyat</p>
                                               </div>
                                               <div className="space-y-2">
-                                                <Label>Market Alış Adedi</Label>
+                                                <Label>Alış Adeti</Label>
                                                 <Input
                                                   value={cityData.sellQuantity ? formatNumberInput(cityData.sellQuantity.toString()) : ''}
                                                   onChange={(e) => updateCityData(
@@ -496,6 +519,7 @@ export default function CreateTablePage() {
                                                   )}
                                                   placeholder="0"
                                                 />
+                                                <p className="text-xs text-muted-foreground">Marketten satın aldığımız adet</p>
                                               </div>
                                             </>
                                           )}

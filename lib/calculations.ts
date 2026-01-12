@@ -19,26 +19,40 @@ export interface ProfitCalculation {
  * - Normal Market'ten satın alıyoruz (maliyet)
  * - Black Market'e satıyoruz (gelir)
  * 
- * Black Market: Bizim Black Market'e sattığımız fiyat = GELİR (tax yok)
- * Normal Market: Bizim marketten satın aldığımız fiyat = MALİYET (tax yok, sadece fiyat)
+ * Buy Order Kapalı (Sell Order):
+ * - Black Market: buyPrice = Black Market'in aldığı fiyat (bizim sattığımız), sellQuantity = bizim sattığımız adet
+ * - Normal Market: sellPrice = Market'in sattığı fiyat (bizim satın aldığımız), sellQuantity = bizim satın aldığımız adet
+ * 
+ * Buy Order Açık:
+ * - Black Market: Aynı
+ * - Normal Market: buyPrice = Buy order fiyatı, buyQuantity = Buy order adedi
+ * 
+ * Tax Mantığı:
+ * - Satın alırken: Tax yok
+ * - Buy order'da: Setup fee var (%2.5)
+ * - Satarken: Tax var (Premium %4, Premiumsuz %8) + Setup fee (%2.5)
  */
 export function calculateItemProfit(
   item: Item,
   isPremium: boolean,
   orderType: OrderType
 ): ProfitCalculation {
-  // Black Market'e sattığımız fiyat = GELİR (tax yok, Black Market direkt alıyor)
-  const blackMarketRevenue = (item.caerleonBlackMarket.buyPrice || 0) * (item.caerleonBlackMarket.buyQuantity || 0);
+  const taxRate = isPremium ? PREMIUM_TAX : NON_PREMIUM_TAX;
   
-  // Normal Market'ten satın aldığımız fiyat = MALİYET
-  // Satın alırken tax ödemiyoruz, sadece fiyat ödüyoruz
+  // Black Market'e sattığımız = GELİR
+  // buyPrice = Black Market'in aldığı fiyat (bizim sattığımız)
+  // sellQuantity = Bizim Black Market'e sattığımız adet
+  const blackMarketRevenue = (item.caerleonBlackMarket.buyPrice || 0) * (item.caerleonBlackMarket.sellQuantity || 0);
+  
+  // Normal Market'ten satın aldığımız = MALİYET
   let totalCost = 0;
   let totalQuantity = 0;
   
   item.cities.forEach((city: CityData) => {
     if (orderType === 'buy_order') {
-      // Buy order: Marketten buy order ile satın alıyoruz
-      // Sadece setup fee var
+      // Buy Order: Marketten buy order ile satın alıyoruz
+      // buyPrice = Buy order fiyatı, buyQuantity = Buy order adedi
+      // Setup fee var (%2.5)
       if (city.buyPrice && city.buyQuantity) {
         const cost = city.buyPrice * city.buyQuantity;
         const setupFee = cost * SETUP_FEE;
@@ -46,8 +60,10 @@ export function calculateItemProfit(
         totalQuantity += city.buyQuantity;
       }
     } else {
-      // Sell order: Marketten direkt satın alıyoruz (sell order yok, normal satın alma)
-      // Normal satın almada tax yok, sadece fiyat öderiz
+      // Sell Order: Marketten direkt satın alıyoruz
+      // sellPrice = Market'in sattığı fiyat (bizim satın aldığımız)
+      // sellQuantity = Bizim satın aldığımız adet
+      // Satın alırken tax yok, sadece fiyat öderiz
       if (city.sellPrice && city.sellQuantity) {
         const cost = city.sellPrice * city.sellQuantity;
         totalCost += cost; // Satın alırken tax yok

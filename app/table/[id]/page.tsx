@@ -12,6 +12,7 @@ import { Table, TableVersion, Item, OrderType, CityName, ItemQuality } from '@/t
 import { TIERS, QUALITIES, CITIES } from '@/lib/constants';
 import { formatTurkeyDateReadable } from '@/lib/date-utils';
 import { calculateTableStatistics } from '@/lib/calculations';
+import { formatNumberInput, parseFormattedNumber } from '@/lib/format';
 import { Plus, X, ChevronDown, ChevronUp, Save, History, ArrowLeft } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import Link from 'next/link';
@@ -116,6 +117,7 @@ export default function TableDetailPage() {
       caerleonBlackMarket: {
         buyPrice: 0,
         buyQuantity: 0,
+        sellQuantity: 0,
       },
     };
     setEditedData({
@@ -520,50 +522,79 @@ export default function TableDetailPage() {
                       )}
 
                       {/* Caerleon Black Market */}
-                      <div className="border-t pt-4">
-                        <Label className="text-base font-semibold">
+                      <div className="border-t pt-4 space-y-4">
+                        <Label className="text-base font-semibold block">
                           Caerleon Black Market
                         </Label>
-                        <div className="grid grid-cols-2 gap-4 mt-2">
-                          <div>
+                        <div className="grid grid-cols-3 gap-4">
+                          <div className="space-y-2">
                             <Label>Alış Fiyatı</Label>
                             {isEditing ? (
                               <Input
-                                type="number"
-                                min="0"
-                                value={item.caerleonBlackMarket.buyPrice || ''}
-                                onChange={(e) => updateItem(item.id, {
-                                  caerleonBlackMarket: {
-                                    ...item.caerleonBlackMarket,
-                                    buyPrice: parseFloat(e.target.value) || 0,
-                                  },
-                                })}
+                                value={item.caerleonBlackMarket.buyPrice ? formatNumberInput(item.caerleonBlackMarket.buyPrice.toString()) : ''}
+                                onChange={(e) => {
+                                  const value = parseFormattedNumber(e.target.value);
+                                  updateItem(item.id, {
+                                    caerleonBlackMarket: {
+                                      ...item.caerleonBlackMarket,
+                                      buyPrice: value,
+                                    },
+                                  });
+                                }}
+                                placeholder="0"
                               />
                             ) : (
                               <p className="text-sm py-2">
-                                {item.caerleonBlackMarket.buyPrice.toLocaleString('tr-TR')}
+                                {item.caerleonBlackMarket.buyPrice?.toLocaleString('tr-TR') || '0'}
                               </p>
                             )}
+                            <p className="text-xs text-muted-foreground">Black Market'in aldığı fiyat</p>
                           </div>
-                          <div>
+                          <div className="space-y-2">
                             <Label>Alış Adedi</Label>
                             {isEditing ? (
                               <Input
-                                type="number"
-                                min="0"
-                                value={item.caerleonBlackMarket.buyQuantity || ''}
-                                onChange={(e) => updateItem(item.id, {
-                                  caerleonBlackMarket: {
-                                    ...item.caerleonBlackMarket,
-                                    buyQuantity: parseInt(e.target.value) || 0,
-                                  },
-                                })}
+                                value={item.caerleonBlackMarket.buyQuantity ? formatNumberInput(item.caerleonBlackMarket.buyQuantity.toString()) : ''}
+                                onChange={(e) => {
+                                  const value = parseFormattedNumber(e.target.value);
+                                  updateItem(item.id, {
+                                    caerleonBlackMarket: {
+                                      ...item.caerleonBlackMarket,
+                                      buyQuantity: Math.floor(value),
+                                    },
+                                  });
+                                }}
+                                placeholder="0"
                               />
                             ) : (
                               <p className="text-sm py-2">
-                                {item.caerleonBlackMarket.buyQuantity.toLocaleString('tr-TR')}
+                                {item.caerleonBlackMarket.buyQuantity?.toLocaleString('tr-TR') || '0'}
                               </p>
                             )}
+                            <p className="text-xs text-muted-foreground">Black Market'in aldığı maksimum adet</p>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Satış Adedi</Label>
+                            {isEditing ? (
+                              <Input
+                                value={item.caerleonBlackMarket.sellQuantity ? formatNumberInput(item.caerleonBlackMarket.sellQuantity.toString()) : ''}
+                                onChange={(e) => {
+                                  const value = parseFormattedNumber(e.target.value);
+                                  updateItem(item.id, {
+                                    caerleonBlackMarket: {
+                                      ...item.caerleonBlackMarket,
+                                      sellQuantity: Math.floor(value),
+                                    },
+                                  });
+                                }}
+                                placeholder="0"
+                              />
+                            ) : (
+                              <p className="text-sm py-2">
+                                {item.caerleonBlackMarket.sellQuantity?.toLocaleString('tr-TR') || '0'}
+                              </p>
+                            )}
+                            <p className="text-xs text-muted-foreground">Bizim Black Market'e sattığımız adet</p>
                           </div>
                         </div>
                       </div>
@@ -623,91 +654,91 @@ export default function TableDetailPage() {
                                       )}
                                     </div>
                                     {(isExpanded || !isEditing) && (
-                                      <div className="grid grid-cols-2 gap-4 mt-2">
+                                      <div className="grid grid-cols-2 gap-4 mt-4">
                                         {displayData.orderType === 'buy_order' ? (
                                           <>
-                                            <div>
-                                              <Label>Market Satış Fiyatı</Label>
+                                            <div className="space-y-2">
+                                              <Label>Buy Order Fiyatı</Label>
                                               {isEditing ? (
                                                 <Input
-                                                  type="number"
-                                                  min="0"
-                                                  value={cityData.buyPrice || ''}
+                                                  value={cityData.buyPrice ? formatNumberInput(cityData.buyPrice.toString()) : ''}
                                                   onChange={(e) => updateCityData(
                                                     item.id,
                                                     city,
                                                     'buyPrice',
-                                                    parseFloat(e.target.value) || 0
+                                                    parseFormattedNumber(e.target.value)
                                                   )}
+                                                  placeholder="0"
                                                 />
                                               ) : (
                                                 <p className="text-sm py-2">
                                                   {cityData.buyPrice?.toLocaleString('tr-TR') || '-'}
                                                 </p>
                                               )}
+                                              <p className="text-xs text-muted-foreground">Bizim buy order oluşturduğumuz ücret</p>
                                             </div>
-                                            <div>
-                                              <Label>Market Alış Adedi</Label>
+                                            <div className="space-y-2">
+                                              <Label>Buy Order Adedi</Label>
                                               {isEditing ? (
                                                 <Input
-                                                  type="number"
-                                                  min="0"
-                                                  value={cityData.buyQuantity || ''}
+                                                  value={cityData.buyQuantity ? formatNumberInput(cityData.buyQuantity.toString()) : ''}
                                                   onChange={(e) => updateCityData(
                                                     item.id,
                                                     city,
                                                     'buyQuantity',
-                                                    parseInt(e.target.value) || 0
+                                                    Math.floor(parseFormattedNumber(e.target.value))
                                                   )}
+                                                  placeholder="0"
                                                 />
                                               ) : (
                                                 <p className="text-sm py-2">
                                                   {cityData.buyQuantity?.toLocaleString('tr-TR') || '-'}
                                                 </p>
                                               )}
+                                              <p className="text-xs text-muted-foreground">Bizim satın almak için oluşturduğumuz toplam adet</p>
                                             </div>
                                           </>
                                         ) : (
                                           <>
-                                            <div>
-                                              <Label>Market Satış Fiyatı</Label>
+                                            <div className="space-y-2">
+                                              <Label>Satış Fiyatı</Label>
                                               {isEditing ? (
                                                 <Input
-                                                  type="number"
-                                                  min="0"
-                                                  value={cityData.sellPrice || ''}
+                                                  value={cityData.sellPrice ? formatNumberInput(cityData.sellPrice.toString()) : ''}
                                                   onChange={(e) => updateCityData(
                                                     item.id,
                                                     city,
                                                     'sellPrice',
-                                                    parseFloat(e.target.value) || 0
+                                                    parseFormattedNumber(e.target.value)
                                                   )}
+                                                  placeholder="0"
                                                 />
                                               ) : (
                                                 <p className="text-sm py-2">
                                                   {cityData.sellPrice?.toLocaleString('tr-TR') || '-'}
                                                 </p>
                                               )}
+                                              <p className="text-xs text-muted-foreground">Bizim satın aldığımız, Market'in sattığı fiyat</p>
                                             </div>
-                                            <div>
-                                              <Label>Market Alış Adedi</Label>
+                                            <div className="space-y-2">
+                                              <Label>Alış Adeti</Label>
                                               {isEditing ? (
                                                 <Input
-                                                  type="number"
-                                                  min="0"
-                                                  value={cityData.sellQuantity || ''}
+                                                  value={cityData.sellQuantity ? formatNumberInput(cityData.sellQuantity.toString()) : ''}
                                                   onChange={(e) => updateCityData(
                                                     item.id,
                                                     city,
                                                     'sellQuantity',
-                                                    parseInt(e.target.value) || 0
+                                                    Math.floor(parseFormattedNumber(e.target.value))
                                                   )}
+                                                  placeholder="0"
                                                 />
                                               ) : (
                                                 <p className="text-sm py-2">
                                                   {cityData.sellQuantity?.toLocaleString('tr-TR') || '-'}
                                                 </p>
                                               )}
+                                              <p className="text-xs text-muted-foreground">Marketten satın aldığımız adet</p>
                                             </div>
                                           </>
                                         )}

@@ -27,8 +27,9 @@ export interface Item {
   quality: ItemQuality;
   cities: CityData[];
   caerleonBlackMarket: {
-    buyPrice: number;
-    buyQuantity: number;
+    buyPrice: number; // Black Market'in aldığı fiyat (bizim sattığımız)
+    buyQuantity: number; // Black Market'in aldığı maksimum adet
+    sellQuantity: number; // Bizim Black Market'e sattığımız adet
   };
 }
 
