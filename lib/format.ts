@@ -31,3 +31,12 @@ export function formatNumberInput(value: string): string {
   if (isNaN(num)) return '';
   return num.toLocaleString('tr-TR');
 }
+
+/**
+ * Format currency without .00 decimals
+ * Example: 500000 -> "$500.000" (not "$500.000,00")
+ */
+export function formatCurrency(value: number): string {
+  if (value === 0) return '$0';
+  return '$' + Math.round(value).toLocaleString('tr-TR');
+}

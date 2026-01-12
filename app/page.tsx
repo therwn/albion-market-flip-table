@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table } from '@/types';
 import { formatTurkeyDateReadable } from '@/lib/date-utils';
-import { Plus, ArrowRight } from 'lucide-react';
+import { formatCurrency } from '@/lib/format';
+import { Plus, ArrowRight, Edit, Trash2 } from 'lucide-react';
 
 interface Statistics {
   mostSoldItems: Array<{ itemName: string; quantity: number }>;
@@ -34,6 +35,27 @@ export default function Home() {
       console.error('Error fetching tables:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (tableId: string) => {
+    if (!confirm('Bu tabloyu silmek istediğinizden emin misiniz?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/tables/${tableId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Tablo silinemedi');
+      }
+
+      fetchTables();
+    } catch (error) {
+      console.error('Error deleting table:', error);
+      alert('Tablo silinirken bir hata oluştu.');
     }
   };
 
@@ -95,10 +117,7 @@ export default function Home() {
                       <div key={index} className="flex justify-between">
                         <span className="text-sm">{item.itemName || 'İsimsiz'}</span>
                         <span className="text-sm font-semibold text-green-600">
-                          {item.profit.toLocaleString('tr-TR', {
-                            style: 'currency',
-                            currency: 'USD',
-                          })}
+                          {formatCurrency(item.profit)}
                         </span>
                       </div>
                     ))}
@@ -118,10 +137,7 @@ export default function Home() {
                       <div key={index} className="flex justify-between">
                         <span className="text-sm">{item.itemName || 'İsimsiz'}</span>
                         <span className="text-sm font-semibold">
-                          {item.profit.toLocaleString('tr-TR', {
-                            style: 'currency',
-                            currency: 'USD',
-                          })}
+                          {formatCurrency(item.profit)}
                         </span>
                       </div>
                     ))}
@@ -181,13 +197,25 @@ export default function Home() {
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter>
-                  <Link href={`/table/${table.id}`} className="w-full">
+                <CardFooter className="flex gap-2">
+                  <Link href={`/table/${table.id}`} className="flex-1">
                     <Button variant="outline" className="w-full">
                       Detay
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
+                  <Link href={`/table/${table.id}?edit=true`}>
+                    <Button variant="outline" size="icon">
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                  <Button 
+                    variant="outline" 
+                    size="icon"
+                    onClick={() => handleDelete(table.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </CardFooter>
               </Card>
             ))}

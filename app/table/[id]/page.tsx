@@ -12,7 +12,7 @@ import { Table, TableVersion, Item, OrderType, CityName, ItemQuality } from '@/t
 import { TIERS, QUALITIES, CITIES } from '@/lib/constants';
 import { formatTurkeyDateReadable } from '@/lib/date-utils';
 import { calculateTableStatistics } from '@/lib/calculations';
-import { formatNumberInput, parseFormattedNumber } from '@/lib/format';
+import { formatNumberInput, parseFormattedNumber, formatCurrency, formatNumber } from '@/lib/format';
 import { Plus, X, ChevronDown, ChevronUp, Save, History, ArrowLeft } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import Link from 'next/link';
@@ -24,6 +24,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function TableDetailPage() {
   const params = useParams();
@@ -322,184 +323,16 @@ export default function TableDetailPage() {
           </div>
         </div>
 
-        {/* İstatistikler */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Toplam Kar</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-green-600">
-                {statistics.totalProfit.toLocaleString('tr-TR', {
-                  style: 'currency',
-                  currency: 'USD',
-                })}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Toplam Zarar</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-red-600">
-                {statistics.totalLoss.toLocaleString('tr-TR', {
-                  style: 'currency',
-                  currency: 'USD',
-                })}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Net Kar</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">
-                {statistics.netProfit.toLocaleString('tr-TR', {
-                  style: 'currency',
-                  currency: 'USD',
-                })}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Item Sayısı</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">{displayData.items.length}</p>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Tabs */}
+        <Tabs defaultValue="items" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="items">Item Detay</TabsTrigger>
+            <TabsTrigger value="statistics">İstatistikler</TabsTrigger>
+          </TabsList>
 
-        {/* Ürün Bazlı Kar/Zarar Detayları */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Ürün Bazlı Kar/Zarar Detayları</CardTitle>
-            <CardDescription>
-              Her ürün için detaylı kar/zarar hesaplamaları
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {statistics.itemCalculations.map((calc, index) => (
-                <div key={index} className="border rounded-lg p-4 space-y-2">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="font-semibold">{calc.itemName || 'İsimsiz Ürün'}</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Tier: {calc.tier} | Quality: {calc.quality}
-                      </p>
-                    </div>
-                    <div className={`text-right ${calc.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      <p className="text-lg font-bold">
-                        {calc.profit.toLocaleString('tr-TR', {
-                          style: 'currency',
-                          currency: 'USD',
-                        })}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {calc.profitMargin >= 0 ? '+' : ''}{calc.profitMargin.toFixed(2)}%
-                      </p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-3 gap-4 pt-2 border-t text-sm">
-                    <div>
-                      <p className="text-muted-foreground">Toplam Gelir</p>
-                      <p className="font-semibold text-green-600">
-                        {calc.totalRevenue.toLocaleString('tr-TR', {
-                          style: 'currency',
-                          currency: 'USD',
-                        })}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Toplam Maliyet</p>
-                      <p className="font-semibold text-red-600">
-                        {calc.totalCost.toLocaleString('tr-TR', {
-                          style: 'currency',
-                          currency: 'USD',
-                        })}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Adet</p>
-                      <p className="font-semibold">{calc.quantity}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-              {statistics.itemCalculations.length === 0 && (
-                <p className="text-center text-muted-foreground py-8">
-                  Henüz ürün eklenmemiş.
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* En Çok Satılan / Kar Ettiren Ürünler */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">En Çok Satılan Ürünler</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {statistics.mostSoldItems.slice(0, 5).map((item, index) => (
-                  <div key={index} className="flex justify-between">
-                    <span className="text-sm">{item.itemName}</span>
-                    <span className="text-sm font-semibold">{item.quantity}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">En Çok Kar Ettiren Ürünler</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {statistics.mostProfitableItems.slice(0, 5).map((item, index) => (
-                  <div key={index} className="flex justify-between">
-                    <span className="text-sm">{item.itemName}</span>
-                    <span className="text-sm font-semibold text-green-600">
-                      {item.profit.toLocaleString('tr-TR', {
-                        style: 'currency',
-                        currency: 'USD',
-                      })}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">En Düşük Karlı Ürünler</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {statistics.leastProfitableItems.slice(0, 5).map((item, index) => (
-                  <div key={index} className="flex justify-between">
-                    <span className="text-sm">{item.itemName}</span>
-                    <span className="text-sm font-semibold">
-                      {item.profit.toLocaleString('tr-TR', {
-                        style: 'currency',
-                        currency: 'USD',
-                      })}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Item Listesi */}
-        <Card>
+          <TabsContent value="items" className="space-y-8">
+            {/* Item Listesi */}
+            <Card>
           <CardHeader>
             <div className="flex justify-between items-center">
               <div>
@@ -636,7 +469,7 @@ export default function TableDetailPage() {
                               />
                             ) : (
                               <p className="text-sm py-2">
-                                {item.caerleonBlackMarket.buyPrice?.toLocaleString('tr-TR') || '0'}
+                                {item.caerleonBlackMarket.buyPrice ? formatNumber(item.caerleonBlackMarket.buyPrice) : '0'}
                               </p>
                             )}
                             <p className="text-xs text-muted-foreground">Black Market&apos;in aldığı fiyat</p>
@@ -659,7 +492,7 @@ export default function TableDetailPage() {
                               />
                             ) : (
                               <p className="text-sm py-2">
-                                {item.caerleonBlackMarket.buyQuantity?.toLocaleString('tr-TR') || '0'}
+                                {item.caerleonBlackMarket.buyQuantity ? formatNumber(item.caerleonBlackMarket.buyQuantity) : '0'}
                               </p>
                             )}
                             <p className="text-xs text-muted-foreground">Black Market&apos;in aldığı maksimum adet</p>
@@ -682,7 +515,7 @@ export default function TableDetailPage() {
                               />
                             ) : (
                               <p className="text-sm py-2">
-                                {item.caerleonBlackMarket.sellQuantity?.toLocaleString('tr-TR') || '0'}
+                                {item.caerleonBlackMarket.sellQuantity ? formatNumber(item.caerleonBlackMarket.sellQuantity) : '0'}
                               </p>
                             )}
                             <p className="text-xs text-muted-foreground">Bizim Black Market&apos;e sattığımız adet</p>
@@ -770,7 +603,7 @@ export default function TableDetailPage() {
                                                 />
                                               ) : (
                                                 <p className="text-sm py-2">
-                                                  {cityData.buyPrice?.toLocaleString('tr-TR') || '-'}
+                                                  {cityData.buyPrice ? formatNumber(cityData.buyPrice) : '-'}
                                                 </p>
                                               )}
                                               <p className="text-xs text-muted-foreground">Bizim buy order oluşturduğumuz ücret</p>
@@ -790,7 +623,7 @@ export default function TableDetailPage() {
                                                 />
                                               ) : (
                                                 <p className="text-sm py-2">
-                                                  {cityData.buyQuantity?.toLocaleString('tr-TR') || '-'}
+                                                  {cityData.buyQuantity ? formatNumber(cityData.buyQuantity) : '-'}
                                                 </p>
                                               )}
                                               <p className="text-xs text-muted-foreground">Bizim satın almak için oluşturduğumuz toplam adet</p>
@@ -813,7 +646,7 @@ export default function TableDetailPage() {
                                                 />
                                               ) : (
                                                 <p className="text-sm py-2">
-                                                  {cityData.sellPrice?.toLocaleString('tr-TR') || '-'}
+                                                  {cityData.sellPrice ? formatNumber(cityData.sellPrice) : '-'}
                                                 </p>
                                               )}
                                               <p className="text-xs text-muted-foreground">Bizim satın aldığımız, Market&apos;in sattığı fiyat</p>
@@ -833,7 +666,7 @@ export default function TableDetailPage() {
                                                 />
                                               ) : (
                                                 <p className="text-sm py-2">
-                                                  {cityData.sellQuantity?.toLocaleString('tr-TR') || '-'}
+                                                  {cityData.sellQuantity ? formatNumber(cityData.sellQuantity) : '-'}
                                                 </p>
                                               )}
                                               <p className="text-xs text-muted-foreground">Marketten satın aldığımız adet</p>
@@ -866,6 +699,159 @@ export default function TableDetailPage() {
             )}
           </CardContent>
         </Card>
+          </TabsContent>
+
+          <TabsContent value="statistics" className="space-y-8">
+            {/* İstatistikler */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Net Kar</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className={`text-2xl font-bold ${statistics.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {formatCurrency(statistics.netProfit)}
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Toplam Zarar</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-bold text-red-600">
+                    {formatCurrency(statistics.totalLoss)}
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Ortalama Kar/Zarar</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className={`text-2xl font-bold ${displayData.items.length > 0 ? (statistics.netProfit / displayData.items.length >= 0 ? 'text-green-600' : 'text-red-600') : ''}`}>
+                    {displayData.items.length > 0 
+                      ? formatCurrency(statistics.netProfit / displayData.items.length)
+                      : formatCurrency(0)}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {displayData.items.length} ürün için ortalama
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Ürün Bazlı Kar/Zarar Detayları */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Ürün Bazlı Kar/Zarar Detayları</CardTitle>
+                <CardDescription>
+                  Her ürün için detaylı kar/zarar hesaplamaları
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {statistics.itemCalculations.map((calc, index) => (
+                    <div key={index} className="border rounded-lg p-4 space-y-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-semibold">{calc.itemName || 'İsimsiz Ürün'}</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Tier: {calc.tier} | Quality: {calc.quality}
+                          </p>
+                        </div>
+                        <div className={`text-right ${calc.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          <p className="text-lg font-bold">
+                            {formatCurrency(calc.profit)}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {calc.profitMargin >= 0 ? '+' : ''}{calc.profitMargin.toFixed(2)}%
+                          </p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-3 gap-4 pt-2 border-t text-sm">
+                        <div>
+                          <p className="text-muted-foreground">Toplam Gelir</p>
+                          <p className="font-semibold text-green-600">
+                            {formatCurrency(calc.totalRevenue)}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Toplam Maliyet</p>
+                          <p className="font-semibold text-red-600">
+                            {formatCurrency(calc.totalCost)}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Adet</p>
+                          <p className="font-semibold">{calc.quantity}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {statistics.itemCalculations.length === 0 && (
+                    <p className="text-center text-muted-foreground py-8">
+                      Henüz ürün eklenmemiş.
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* En Çok Satılan / Kar Ettiren Ürünler */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">En Çok Satılan Ürünler</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {statistics.mostSoldItems.slice(0, 5).map((item, index) => (
+                      <div key={index} className="flex justify-between">
+                        <span className="text-sm">{item.itemName}</span>
+                        <span className="text-sm font-semibold">{item.quantity}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">En Çok Kar Ettiren Ürünler</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {statistics.mostProfitableItems.slice(0, 5).map((item, index) => (
+                      <div key={index} className="flex justify-between">
+                        <span className="text-sm">{item.itemName}</span>
+                        <span className="text-sm font-semibold text-green-600">
+                          {formatCurrency(item.profit)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">En Düşük Karlı Ürünler</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {statistics.leastProfitableItems.slice(0, 5).map((item, index) => (
+                      <div key={index} className="flex justify-between">
+                        <span className="text-sm">{item.itemName}</span>
+                        <span className="text-sm font-semibold">
+                          {formatCurrency(item.profit)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </main>
   );
