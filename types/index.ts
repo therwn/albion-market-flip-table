@@ -41,6 +41,7 @@ export interface TableData {
 
 export interface Table {
   id: string;
+  table_name?: string;
   created_by: string;
   created_at: string;
   updated_at: string;
@@ -65,6 +66,18 @@ export interface Statistics {
   mostSoldItems: Array<{ itemName: string; quantity: number }>;
   mostProfitableItems: Array<{ itemName: string; profit: number }>;
   leastProfitableItems: Array<{ itemName: string; profit: number }>;
+  itemCalculations: Array<ProfitCalculation>;
+}
+
+export interface ProfitCalculation {
+  itemName: string;
+  tier: string;
+  quality: string;
+  totalCost: number;
+  totalRevenue: number;
+  profit: number;
+  profitMargin: number;
+  quantity: number;
 }
 
 export interface TimeRangeStatistics {

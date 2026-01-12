@@ -1,16 +1,7 @@
 import { Item, OrderType, CityData } from '@/types';
 import { PREMIUM_TAX, NON_PREMIUM_TAX, MARKET_TAX, SETUP_FEE } from './constants';
 
-export interface ProfitCalculation {
-  itemName: string;
-  tier: string;
-  quality: string;
-  totalCost: number;
-  totalRevenue: number;
-  profit: number;
-  profitMargin: number;
-  quantity: number;
-}
+// ProfitCalculation interface moved to types/index.ts
 
 /**
  * Calculate profit for a single item
@@ -131,5 +122,6 @@ export function calculateTableStatistics(
     mostSoldItems,
     mostProfitableItems,
     leastProfitableItems,
+    itemCalculations: calculations, // Tekli ürün bazlı hesaplamalar
   };
 }

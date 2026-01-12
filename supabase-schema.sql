@@ -3,6 +3,7 @@
 -- Tables: Ana tablo bilgileri
 CREATE TABLE IF NOT EXISTS tables (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  table_name TEXT,
   created_by TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

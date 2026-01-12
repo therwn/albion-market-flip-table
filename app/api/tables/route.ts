@@ -33,12 +33,13 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { created_by, data, is_premium, order_type } = body;
+    const { table_name, created_by, data, is_premium, order_type } = body;
 
     // Create new table
     const { data: table, error: tableError } = await supabase
       .from('tables')
       .insert({
+        table_name: table_name || null,
         created_by,
         data,
         is_premium: is_premium || false,

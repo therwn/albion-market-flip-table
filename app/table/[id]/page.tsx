@@ -249,8 +249,13 @@ export default function TableDetailPage() {
               </Button>
             </Link>
             <h1 className="text-4xl font-bold mt-4">
-              {table.created_by || 'İsimsiz'} - Tablo Detayı
+              {table.table_name || table.created_by || 'İsimsiz Tablo'}
             </h1>
+            {table.table_name && (
+              <p className="text-muted-foreground mt-1">
+                {table.created_by}
+              </p>
+            )}
             <p className="text-muted-foreground mt-2">
               Oluşturulma: {formatTurkeyDateReadable(table.created_at)} | 
               Versiyon: v{table.version_number}
@@ -366,6 +371,72 @@ export default function TableDetailPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Ürün Bazlı Kar/Zarar Detayları */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Ürün Bazlı Kar/Zarar Detayları</CardTitle>
+            <CardDescription>
+              Her ürün için detaylı kar/zarar hesaplamaları
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {statistics.itemCalculations.map((calc, index) => (
+                <div key={index} className="border rounded-lg p-4 space-y-2">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="font-semibold">{calc.itemName || 'İsimsiz Ürün'}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Tier: {calc.tier} | Quality: {calc.quality}
+                      </p>
+                    </div>
+                    <div className={`text-right ${calc.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      <p className="text-lg font-bold">
+                        {calc.profit.toLocaleString('tr-TR', {
+                          style: 'currency',
+                          currency: 'USD',
+                        })}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {calc.profitMargin >= 0 ? '+' : ''}{calc.profitMargin.toFixed(2)}%
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 pt-2 border-t text-sm">
+                    <div>
+                      <p className="text-muted-foreground">Toplam Gelir</p>
+                      <p className="font-semibold text-green-600">
+                        {calc.totalRevenue.toLocaleString('tr-TR', {
+                          style: 'currency',
+                          currency: 'USD',
+                        })}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Toplam Maliyet</p>
+                      <p className="font-semibold text-red-600">
+                        {calc.totalCost.toLocaleString('tr-TR', {
+                          style: 'currency',
+                          currency: 'USD',
+                        })}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Adet</p>
+                      <p className="font-semibold">{calc.quantity}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {statistics.itemCalculations.length === 0 && (
+                <p className="text-center text-muted-foreground py-8">
+                  Henüz ürün eklenmemiş.
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* En Çok Satılan / Kar Ettiren Ürünler */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

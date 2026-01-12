@@ -17,6 +17,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export default function CreateTablePage() {
   const router = useRouter();
+  const [tableName, setTableName] = useState('');
   const [createdBy, setCreatedBy] = useState('');
   const [isPremium, setIsPremium] = useState(false);
   const [orderType, setOrderType] = useState<OrderType>('sell_order');
@@ -159,6 +160,7 @@ export default function CreateTablePage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          table_name: tableName || null,
           created_by: createdBy,
           data: tableData,
           is_premium: isPremium,
@@ -191,6 +193,15 @@ export default function CreateTablePage() {
               <CardTitle>Tablo Detay Bilgileri</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="tableName">Tablo Adı</Label>
+                <Input
+                  id="tableName"
+                  value={tableName}
+                  onChange={(e) => setTableName(e.target.value)}
+                  placeholder="Tablo adını girin"
+                />
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="createdBy">Tabloyu Oluşturan Kişi</Label>
                 <Input

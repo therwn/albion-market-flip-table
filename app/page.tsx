@@ -155,8 +155,9 @@ export default function Home() {
             {tables.map((table) => (
               <Card key={table.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
-                  <CardTitle className="truncate">{table.created_by || 'İsimsiz'}</CardTitle>
+                  <CardTitle className="truncate">{table.table_name || table.created_by || 'İsimsiz Tablo'}</CardTitle>
                   <CardDescription>
+                    {table.table_name && table.created_by && `${table.created_by} • `}
                     {formatTurkeyDateReadable(table.created_at)}
                   </CardDescription>
                 </CardHeader>
