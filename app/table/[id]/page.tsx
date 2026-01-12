@@ -548,7 +548,7 @@ export default function TableDetailPage() {
                                 {item.caerleonBlackMarket.buyPrice?.toLocaleString('tr-TR') || '0'}
                               </p>
                             )}
-                            <p className="text-xs text-muted-foreground">Black Market'in aldığı fiyat</p>
+                            <p className="text-xs text-muted-foreground">Black Market&apos;in aldığı fiyat</p>
                           </div>
                           <div className="space-y-2">
                             <Label>Alış Adedi</Label>
@@ -571,7 +571,7 @@ export default function TableDetailPage() {
                                 {item.caerleonBlackMarket.buyQuantity?.toLocaleString('tr-TR') || '0'}
                               </p>
                             )}
-                            <p className="text-xs text-muted-foreground">Black Market'in aldığı maksimum adet</p>
+                            <p className="text-xs text-muted-foreground">Black Market&apos;in aldığı maksimum adet</p>
                           </div>
                           <div className="space-y-2">
                             <Label>Satış Adedi</Label>
@@ -594,7 +594,7 @@ export default function TableDetailPage() {
                                 {item.caerleonBlackMarket.sellQuantity?.toLocaleString('tr-TR') || '0'}
                               </p>
                             )}
-                            <p className="text-xs text-muted-foreground">Bizim Black Market'e sattığımız adet</p>
+                            <p className="text-xs text-muted-foreground">Bizim Black Market&apos;e sattığımız adet</p>
                           </div>
                         </div>
                       </div>
@@ -718,7 +718,7 @@ export default function TableDetailPage() {
                                                   {cityData.sellPrice?.toLocaleString('tr-TR') || '-'}
                                                 </p>
                                               )}
-                                              <p className="text-xs text-muted-foreground">Bizim satın aldığımız, Market'in sattığı fiyat</p>
+                                              <p className="text-xs text-muted-foreground">Bizim satın aldığımız, Market&apos;in sattığı fiyat</p>
                                             </div>
                                             <div className="space-y-2">
                                               <Label>Alış Adeti</Label>
