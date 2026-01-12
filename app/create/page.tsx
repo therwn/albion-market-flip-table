@@ -45,6 +45,7 @@ export default function CreateTablePage() {
         buyPrice: 0,
         buyQuantity: 0,
         sellQuantity: 0,
+        isSellOrder: false,
       },
     };
     setItems([...items, newItem]);
@@ -361,9 +362,26 @@ export default function CreateTablePage() {
 
                         {/* Caerleon Black Market */}
                         <div className="border-t pt-4 space-y-4">
-                          <Label className="text-base font-semibold block">
-                            Caerleon Black Market
-                          </Label>
+                          <div className="flex justify-between items-center">
+                            <Label className="text-base font-semibold">
+                              Caerleon Black Market
+                            </Label>
+                            <div className="flex items-center gap-2">
+                              <Label htmlFor={`blackMarketOrder-${item.id}`} className="text-sm">
+                                {item.caerleonBlackMarket.isSellOrder ? 'Sell Order' : 'Direkt Sell'}
+                              </Label>
+                              <Switch
+                                id={`blackMarketOrder-${item.id}`}
+                                checked={item.caerleonBlackMarket.isSellOrder}
+                                onCheckedChange={(checked) => updateItem(item.id, {
+                                  caerleonBlackMarket: {
+                                    ...item.caerleonBlackMarket,
+                                    isSellOrder: checked,
+                                  },
+                                })}
+                              />
+                            </div>
+                          </div>
                           <div className="grid grid-cols-3 gap-4">
                             <div className="space-y-2">
                               <Label>Alış Fiyatı</Label>
@@ -417,6 +435,11 @@ export default function CreateTablePage() {
                               <p className="text-xs text-muted-foreground">Bizim Black Market&apos;e sattığımız adet</p>
                             </div>
                           </div>
+                          <p className="text-xs text-muted-foreground">
+                            {item.caerleonBlackMarket.isSellOrder 
+                              ? 'Sell Order: Premium Tax (%4/%8) + Setup Fee (%2.5) düşülecek'
+                              : 'Direkt Sell: Sadece Premium Tax (%4/%8) düşülecek'}
+                          </p>
                         </div>
 
                         {/* Market Bilgileri */}

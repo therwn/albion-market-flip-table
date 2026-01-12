@@ -30,6 +30,7 @@ export interface Item {
     buyPrice: number; // Black Market'in aldığı fiyat (bizim sattığımız)
     buyQuantity: number; // Black Market'in aldığı maksimum adet
     sellQuantity: number; // Bizim Black Market'e sattığımız adet
+    isSellOrder: boolean; // true = Sell Order (tax + setup fee), false = Direkt Sell (sadece tax)
   };
 }
 
