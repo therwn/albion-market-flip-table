@@ -1,7 +1,5 @@
-import { Item, OrderType, CityData } from '@/types';
+import { Item, OrderType, CityData, ProfitCalculation } from '@/types';
 import { PREMIUM_TAX, NON_PREMIUM_TAX, MARKET_TAX, SETUP_FEE } from './constants';
-
-// ProfitCalculation interface moved to types/index.ts
 
 /**
  * Calculate profit for a single item
