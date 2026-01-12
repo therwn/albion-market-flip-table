@@ -14,51 +14,58 @@ export interface ProfitCalculation {
 
 /**
  * Calculate profit for a single item
+ * 
+ * Market Flip Mantığı:
+ * - Normal Market'ten satın alıyoruz (maliyet)
+ * - Black Market'e satıyoruz (gelir)
+ * 
+ * Black Market: Bizim Black Market'e sattığımız fiyat = GELİR (tax yok)
+ * Normal Market: Bizim marketten satın aldığımız fiyat = MALİYET (tax yok, sadece fiyat)
  */
 export function calculateItemProfit(
   item: Item,
   isPremium: boolean,
   orderType: OrderType
 ): ProfitCalculation {
-  const taxRate = isPremium ? PREMIUM_TAX : NON_PREMIUM_TAX;
+  // Black Market'e sattığımız fiyat = GELİR (tax yok, Black Market direkt alıyor)
+  const blackMarketRevenue = (item.caerleonBlackMarket.buyPrice || 0) * (item.caerleonBlackMarket.buyQuantity || 0);
   
-  // Calculate total cost from Caerleon Black Market
-  const caerleonCost = (item.caerleonBlackMarket.buyPrice || 0) * (item.caerleonBlackMarket.buyQuantity || 0);
-  
-  // Calculate total revenue from cities
-  let totalRevenue = 0;
+  // Normal Market'ten satın aldığımız fiyat = MALİYET
+  // Satın alırken tax ödemiyoruz, sadece fiyat ödüyoruz
+  let totalCost = 0;
   let totalQuantity = 0;
   
   item.cities.forEach((city: CityData) => {
     if (orderType === 'buy_order') {
-      // Buy order: only setup fee
+      // Buy order: Marketten buy order ile satın alıyoruz
+      // Sadece setup fee var
       if (city.buyPrice && city.buyQuantity) {
-        const revenue = city.buyPrice * city.buyQuantity;
-        const setupFee = revenue * SETUP_FEE;
-        totalRevenue += revenue - setupFee;
+        const cost = city.buyPrice * city.buyQuantity;
+        const setupFee = cost * SETUP_FEE;
+        totalCost += cost + setupFee; // Setup fee maliyete eklenir
         totalQuantity += city.buyQuantity;
       }
     } else {
-      // Sell order: tax + setup fee
+      // Sell order: Marketten direkt satın alıyoruz (sell order yok, normal satın alma)
+      // Normal satın almada tax yok, sadece fiyat öderiz
       if (city.sellPrice && city.sellQuantity) {
-        const revenue = city.sellPrice * city.sellQuantity;
-        const tax = revenue * taxRate;
-        const setupFee = revenue * SETUP_FEE;
-        totalRevenue += revenue - tax - setupFee;
+        const cost = city.sellPrice * city.sellQuantity;
+        totalCost += cost; // Satın alırken tax yok
         totalQuantity += city.sellQuantity;
       }
     }
   });
   
-  const profit = totalRevenue - caerleonCost;
-  const profitMargin = caerleonCost > 0 ? (profit / caerleonCost) * 100 : 0;
+  // Kar = Gelir - Maliyet
+  const profit = blackMarketRevenue - totalCost;
+  const profitMargin = totalCost > 0 ? (profit / totalCost) * 100 : 0;
   
   return {
     itemName: item.name,
     tier: item.tier,
     quality: item.quality,
-    totalCost: caerleonCost,
-    totalRevenue,
+    totalCost,
+    totalRevenue: blackMarketRevenue,
     profit,
     profitMargin,
     quantity: totalQuantity,
