@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Item, TableData, OrderType, CityName, ItemQuality } from '@/types';
 import { TIERS, QUALITIES, CITIES } from '@/lib/constants';
 import { getTurkeyDateTime, formatTurkeyDateTime } from '@/lib/date-utils';
+import { formatNumberInput, parseFormattedNumber } from '@/lib/format';
 import { Plus, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -22,11 +23,15 @@ export default function CreateTablePage() {
   const [items, setItems] = useState<Item[]>([]);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const [expandedCities, setExpandedCities] = useState<Set<string>>(new Set());
-  const [tierFilter, setTierFilter] = useState('');
+  const [tierFilters, setTierFilters] = useState<Record<string, string>>({});
+  const [openSelects, setOpenSelects] = useState<Record<string, boolean>>({});
 
-  const filteredTiers = TIERS.filter(tier => 
-    tierFilter === '' || tier.startsWith(tierFilter)
-  );
+  const getFilteredTiers = (itemId: string) => {
+    const filter = tierFilters[itemId] || '';
+    return TIERS.filter(tier => 
+      filter === '' || tier.startsWith(filter)
+    );
+  };
 
   const addItem = () => {
     const newItem: Item = {
@@ -161,14 +166,15 @@ export default function CreateTablePage() {
       });
 
       if (!response.ok) {
-        throw new Error('Tablo oluşturulamadı');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Tablo oluşturulamadı');
       }
 
       const table = await response.json();
       router.push(`/table/${table.id}`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating table:', error);
-      alert('Tablo oluşturulurken bir hata oluştu.');
+      alert(`Tablo oluşturulurken bir hata oluştu: ${error.message || 'Bilinmeyen hata'}`);
     }
   };
 
@@ -184,7 +190,7 @@ export default function CreateTablePage() {
               <CardTitle>Tablo Detay Bilgileri</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="createdBy">Tabloyu Oluşturan Kişi</Label>
                 <Input
                   id="createdBy"
@@ -194,7 +200,7 @@ export default function CreateTablePage() {
                   required
                 />
               </div>
-              <div>
+              <div className="space-y-2">
                 <Label>Oluşturulma Tarihi ve Saati</Label>
                 <Input
                   value={formatTurkeyDateTime(getTurkeyDateTime())}
@@ -267,10 +273,10 @@ export default function CreateTablePage() {
                 </p>
               ) : (
                 items.map((item) => (
-                  <div key={item.id} className="border rounded-lg p-4 space-y-4">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1 space-y-4">
-                        <div>
+                  <div key={item.id} className="border rounded-lg p-4 space-y-6">
+                    <div className="flex justify-between items-start gap-4">
+                      <div className="flex-1 space-y-6">
+                        <div className="space-y-2">
                           <Label>Item Adı</Label>
                           <Input
                             value={item.name}
@@ -280,33 +286,46 @@ export default function CreateTablePage() {
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
-                          <div>
+                          <div className="space-y-2">
                             <Label>Item Tier</Label>
-                            <div className="space-y-2">
-                              <Input
-                                placeholder="Tier filtrele (örn: 4)"
-                                value={tierFilter}
-                                onChange={(e) => setTierFilter(e.target.value)}
-                              />
-                              <Select
-                                value={item.tier}
-                                onValueChange={(value) => updateItem(item.id, { tier: value })}
-                              >
-                                <SelectTrigger>
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {filteredTiers.map((tier) => (
-                                    <SelectItem key={tier} value={tier}>
-                                      {tier}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
+                            <Select
+                              value={item.tier}
+                              onValueChange={(value) => {
+                                updateItem(item.id, { tier: value });
+                                setTierFilters(prev => ({ ...prev, [item.id]: '' }));
+                              }}
+                              onOpenChange={(open) => {
+                                setOpenSelects(prev => ({ ...prev, [item.id]: open }));
+                                if (!open) {
+                                  setTierFilters(prev => ({ ...prev, [item.id]: '' }));
+                                }
+                              }}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Tier seçin" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <div className="p-2 border-b">
+                                  <Input
+                                    placeholder="Tier filtrele (örn: 4)"
+                                    value={tierFilters[item.id] || ''}
+                                    onChange={(e) => {
+                                      setTierFilters(prev => ({ ...prev, [item.id]: e.target.value }));
+                                    }}
+                                    onClick={(e) => e.stopPropagation()}
+                                    onKeyDown={(e) => e.stopPropagation()}
+                                  />
+                                </div>
+                                {getFilteredTiers(item.id).map((tier) => (
+                                  <SelectItem key={tier} value={tier}>
+                                    {tier}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
 
-                          <div>
+                          <div className="space-y-2">
                             <Label>Item Quality</Label>
                             <Select
                               value={item.quality}
@@ -329,45 +348,49 @@ export default function CreateTablePage() {
                         </div>
 
                         {/* Caerleon Black Market */}
-                        <div className="border-t pt-4">
-                          <Label className="text-base font-semibold">
+                        <div className="border-t pt-4 space-y-4">
+                          <Label className="text-base font-semibold block">
                             Caerleon Black Market
                           </Label>
-                          <div className="grid grid-cols-2 gap-4 mt-2">
-                            <div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
                               <Label>Alış Fiyatı</Label>
                               <Input
-                                type="number"
-                                min="0"
-                                value={item.caerleonBlackMarket.buyPrice || ''}
-                                onChange={(e) => updateItem(item.id, {
-                                  caerleonBlackMarket: {
-                                    ...item.caerleonBlackMarket,
-                                    buyPrice: parseFloat(e.target.value) || 0,
-                                  },
-                                })}
+                                value={item.caerleonBlackMarket.buyPrice ? formatNumberInput(item.caerleonBlackMarket.buyPrice.toString()) : ''}
+                                onChange={(e) => {
+                                  const value = parseFormattedNumber(e.target.value);
+                                  updateItem(item.id, {
+                                    caerleonBlackMarket: {
+                                      ...item.caerleonBlackMarket,
+                                      buyPrice: value,
+                                    },
+                                  });
+                                }}
+                                placeholder="0"
                               />
                             </div>
-                            <div>
+                            <div className="space-y-2">
                               <Label>Alış Adedi</Label>
                               <Input
-                                type="number"
-                                min="0"
-                                value={item.caerleonBlackMarket.buyQuantity || ''}
-                                onChange={(e) => updateItem(item.id, {
-                                  caerleonBlackMarket: {
-                                    ...item.caerleonBlackMarket,
-                                    buyQuantity: parseInt(e.target.value) || 0,
-                                  },
-                                })}
+                                value={item.caerleonBlackMarket.buyQuantity ? formatNumberInput(item.caerleonBlackMarket.buyQuantity.toString()) : ''}
+                                onChange={(e) => {
+                                  const value = parseFormattedNumber(e.target.value);
+                                  updateItem(item.id, {
+                                    caerleonBlackMarket: {
+                                      ...item.caerleonBlackMarket,
+                                      buyQuantity: Math.floor(value),
+                                    },
+                                  });
+                                }}
+                                placeholder="0"
                               />
                             </div>
                           </div>
                         </div>
 
                         {/* Market Bilgileri */}
-                        <div className="border-t pt-4">
-                          <Label className="text-base font-semibold mb-2 block">
+                        <div className="border-t pt-4 space-y-4">
+                          <Label className="text-base font-semibold block">
                             Market Bilgileri
                           </Label>
                           <div className="space-y-2">
@@ -416,66 +439,62 @@ export default function CreateTablePage() {
                                         </div>
                                       </div>
                                       {isExpanded && (
-                                        <div className="grid grid-cols-2 gap-4 mt-2">
+                                        <div className="grid grid-cols-2 gap-4 mt-4">
                                           {orderType === 'buy_order' ? (
                                             <>
-                                              <div>
+                                              <div className="space-y-2">
                                                 <Label>Market Satış Fiyatı</Label>
                                                 <Input
-                                                  type="number"
-                                                  min="0"
-                                                  value={cityData.buyPrice || ''}
+                                                  value={cityData.buyPrice ? formatNumberInput(cityData.buyPrice.toString()) : ''}
                                                   onChange={(e) => updateCityData(
                                                     item.id,
                                                     city,
                                                     'buyPrice',
-                                                    parseFloat(e.target.value) || 0
+                                                    parseFormattedNumber(e.target.value)
                                                   )}
+                                                  placeholder="0"
                                                 />
                                               </div>
-                                              <div>
+                                              <div className="space-y-2">
                                                 <Label>Market Alış Adedi</Label>
                                                 <Input
-                                                  type="number"
-                                                  min="0"
-                                                  value={cityData.buyQuantity || ''}
+                                                  value={cityData.buyQuantity ? formatNumberInput(cityData.buyQuantity.toString()) : ''}
                                                   onChange={(e) => updateCityData(
                                                     item.id,
                                                     city,
                                                     'buyQuantity',
-                                                    parseInt(e.target.value) || 0
+                                                    Math.floor(parseFormattedNumber(e.target.value))
                                                   )}
+                                                  placeholder="0"
                                                 />
                                               </div>
                                             </>
                                           ) : (
                                             <>
-                                              <div>
+                                              <div className="space-y-2">
                                                 <Label>Market Satış Fiyatı</Label>
                                                 <Input
-                                                  type="number"
-                                                  min="0"
-                                                  value={cityData.sellPrice || ''}
+                                                  value={cityData.sellPrice ? formatNumberInput(cityData.sellPrice.toString()) : ''}
                                                   onChange={(e) => updateCityData(
                                                     item.id,
                                                     city,
                                                     'sellPrice',
-                                                    parseFloat(e.target.value) || 0
+                                                    parseFormattedNumber(e.target.value)
                                                   )}
+                                                  placeholder="0"
                                                 />
                                               </div>
-                                              <div>
+                                              <div className="space-y-2">
                                                 <Label>Market Alış Adedi</Label>
                                                 <Input
-                                                  type="number"
-                                                  min="0"
-                                                  value={cityData.sellQuantity || ''}
+                                                  value={cityData.sellQuantity ? formatNumberInput(cityData.sellQuantity.toString()) : ''}
                                                   onChange={(e) => updateCityData(
                                                     item.id,
                                                     city,
                                                     'sellQuantity',
-                                                    parseInt(e.target.value) || 0
+                                                    Math.floor(parseFormattedNumber(e.target.value))
                                                   )}
+                                                  placeholder="0"
                                                 />
                                               </div>
                                             </>
@@ -495,6 +514,7 @@ export default function CreateTablePage() {
                         variant="destructive"
                         size="icon"
                         onClick={() => deleteItem(item.id)}
+                        className="shrink-0"
                       >
                         <X className="h-4 w-4" />
                       </Button>

@@ -59,12 +59,16 @@ export async function POST(request: Request) {
         data,
       });
 
-    if (versionError) throw versionError;
+    if (versionError) {
+      console.error('Version creation error:', versionError);
+      throw versionError;
+    }
 
     return NextResponse.json(table);
   } catch (error: any) {
+    console.error('Table creation error:', error);
     return NextResponse.json(
-      { error: error.message },
+      { error: error.message || 'Unknown error occurred' },
       { status: 500 }
     );
   }
