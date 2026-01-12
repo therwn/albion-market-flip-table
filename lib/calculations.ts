@@ -44,7 +44,7 @@ export function calculateItemProfit(
   
   // Black Market tax hesaplaması
   const blackMarketTax = grossRevenue * taxRate; // Premium %4 veya Premiumsuz %8
-  const blackMarketSetupFee = item.caerleonBlackMarket.isSellOrder ? grossRevenue * SETUP_FEE : 0; // Sell Order ise setup fee var
+  const blackMarketSetupFee = (item.caerleonBlackMarket.isSellOrder || false) ? grossRevenue * SETUP_FEE : 0; // Sell Order ise setup fee var
   const blackMarketRevenue = grossRevenue - blackMarketTax - blackMarketSetupFee; // NET gelir
   
   // Normal Market'ten satın aldığımız = MALİYET
