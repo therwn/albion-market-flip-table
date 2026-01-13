@@ -205,6 +205,40 @@ export default function TableDetailPage() {
     tierFilter === '' || tier.startsWith(tierFilter)
   );
 
+  // Keyboard shortcuts - must be called before early returns
+  useKeyboardShortcuts([
+    {
+      key: 'e',
+      ctrl: true,
+      action: () => {
+        if (!isEditing && table && editedData) {
+          setIsEditing(true);
+        }
+      },
+      description: 'Düzenleme modunu aç/kapat',
+    },
+    {
+      key: 's',
+      ctrl: true,
+      action: () => {
+        if (isEditing && table && editedData) {
+          handleSave();
+        }
+      },
+      description: 'Kaydet',
+    },
+    {
+      key: 'Escape',
+      action: () => {
+        if (isEditing && table && editedData) {
+          setEditedData(table.data);
+          setIsEditing(false);
+        }
+      },
+      description: 'Düzenlemeyi iptal et',
+    },
+  ]);
+
   if (loading) {
     return (
       <main className="min-h-screen p-8">
@@ -228,40 +262,6 @@ export default function TableDetailPage() {
   );
 
   const displayData = isEditing ? editedData : table.data;
-
-  // Keyboard shortcuts
-  useKeyboardShortcuts([
-    {
-      key: 'e',
-      ctrl: true,
-      action: () => {
-        if (!isEditing) {
-          setIsEditing(true);
-        }
-      },
-      description: 'Düzenleme modunu aç/kapat',
-    },
-    {
-      key: 's',
-      ctrl: true,
-      action: () => {
-        if (isEditing) {
-          handleSave();
-        }
-      },
-      description: 'Kaydet',
-    },
-    {
-      key: 'Escape',
-      action: () => {
-        if (isEditing) {
-          setEditedData(table.data);
-          setIsEditing(false);
-        }
-      },
-      description: 'Düzenlemeyi iptal et',
-    },
-  ]);
 
   // Export to CSV
   const handleExportCSV = () => {

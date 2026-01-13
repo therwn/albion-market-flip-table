@@ -21,12 +21,6 @@ export default function ShareTablePage() {
   const [table, setTable] = useState<Table | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (tableId) {
-      fetchTable();
-    }
-  }, [tableId]);
-
   const fetchTable = async () => {
     try {
       const response = await fetch(`/api/tables/${tableId}`);
@@ -38,6 +32,13 @@ export default function ShareTablePage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (tableId) {
+      fetchTable();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tableId]);
 
   if (loading) {
     return (
