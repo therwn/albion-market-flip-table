@@ -25,11 +25,11 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { ProfitChart } from '@/components/profit-chart';
 import { exportTableToCSV, downloadCSV } from '@/lib/export';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
+import { ItemsTable } from '@/components/items-table';
 
 export default function TableDetailPage() {
   const params = useParams();
@@ -400,401 +400,37 @@ export default function TableDetailPage() {
           <TabsContent value="items" className="space-y-8">
             {/* Item Listesi */}
             <Card>
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <div>
-                <CardTitle>Item Detay Bilgileri</CardTitle>
-                <CardDescription>
-                  {isEditing ? 'Itemleri düzenleyin' : 'Item bilgilerini görüntüleyin'}
-                </CardDescription>
-              </div>
-              {isEditing && (
-                <Button onClick={addItem}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Item Ekle
-                </Button>
-              )}
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {displayData.items.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">
-                Henüz item eklenmemiş.
-              </p>
-            ) : (
-              <Accordion type="multiple" className="w-full">
-                {displayData.items.map((item) => (
-                  <AccordionItem key={item.id} value={item.id} className="border rounded-lg px-4 mb-4">
-                    <AccordionTrigger className="hover:no-underline">
-                      <div className="flex justify-between items-center w-full pr-4">
-                        <div className="text-left">
-                          {isEditing ? (
-                            <Input
-                              value={item.name}
-                              onChange={(e) => updateItem(item.id, { name: e.target.value })}
-                              placeholder="Item adını girin"
-                              onClick={(e) => e.stopPropagation()}
-                              className="w-auto min-w-[200px]"
-                            />
-                          ) : (
-                            <h3 className="font-semibold text-lg">{item.name || 'İsimsiz Item'}</h3>
-                          )}
-                          <p className="text-sm text-muted-foreground">
-                            Tier: {item.tier} | Quality: {item.quality}
-                          </p>
-                        </div>
-                        {isEditing && (
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="icon"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteItem(item.id);
-                            }}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className="space-y-4 pt-4">
-                      {isEditing ? (
-                        <>
-                          <div>
-                            <Label>Item Adı</Label>
-                            <Input
-                              value={item.name}
-                              onChange={(e) => updateItem(item.id, { name: e.target.value })}
-                              placeholder="Item adını girin"
-                            />
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <Label>Item Tier</Label>
-                              <div className="space-y-2">
-                                <Input
-                                  placeholder="Tier filtrele"
-                                  value={tierFilter}
-                                  onChange={(e) => setTierFilter(e.target.value)}
-                                />
-                                <Select
-                                  value={item.tier}
-                                  onValueChange={(value) => updateItem(item.id, { tier: value })}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {filteredTiers.map((tier) => (
-                                      <SelectItem key={tier} value={tier}>
-                                        {tier}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                            </div>
-                            <div>
-                              <Label>Item Quality</Label>
-                              <Select
-                                value={item.quality}
-                                onValueChange={(value) =>
-                                  updateItem(item.id, { quality: value as ItemQuality })
-                                }
-                              >
-                                <SelectTrigger>
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {QUALITIES.map((quality) => (
-                                    <SelectItem key={quality} value={quality}>
-                                      {quality}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        <div>
-                          <h3 className="font-semibold text-lg">{item.name}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            Tier: {item.tier} | Quality: {item.quality}
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Caerleon Black Market */}
-                      <Accordion type="single" collapsible className="w-full">
-                        <AccordionItem value="black-market" className="border-t pt-4">
-                          <AccordionTrigger className="hover:no-underline">
-                            <Label className="text-base font-semibold">
-                              Caerleon Black Market
-                            </Label>
-                          </AccordionTrigger>
-                          <AccordionContent>
-                            <div className="space-y-4 pt-4">
-                              {isEditing && (
-                                <div className="flex items-center gap-2 pb-2">
-                                  <Label htmlFor={`blackMarketOrder-${item.id}`} className="text-sm">
-                                    {item.caerleonBlackMarket.isSellOrder ? 'Sell Order' : 'Direkt Sell'}
-                                  </Label>
-                                  <Switch
-                                    id={`blackMarketOrder-${item.id}`}
-                                    checked={item.caerleonBlackMarket.isSellOrder || false}
-                                    onCheckedChange={(checked) => updateItem(item.id, {
-                                      caerleonBlackMarket: {
-                                        ...item.caerleonBlackMarket,
-                                        isSellOrder: checked,
-                                      },
-                                    })}
-                                  />
-                                </div>
-                              )}
-                              <div className="grid grid-cols-3 gap-4">
-                                <div className="space-y-2">
-                            <Label>Alış Fiyatı</Label>
-                            {isEditing ? (
-                              <Input
-                                value={item.caerleonBlackMarket.buyPrice ? formatNumberInput(item.caerleonBlackMarket.buyPrice.toString()) : ''}
-                                onChange={(e) => {
-                                  const value = parseFormattedNumber(e.target.value);
-                                  updateItem(item.id, {
-                                    caerleonBlackMarket: {
-                                      ...item.caerleonBlackMarket,
-                                      buyPrice: value,
-                                    },
-                                  });
-                                }}
-                                placeholder="0"
-                              />
-                            ) : (
-                              <p className="text-sm py-2">
-                                {item.caerleonBlackMarket.buyPrice ? formatNumber(item.caerleonBlackMarket.buyPrice) : '0'}
-                              </p>
-                            )}
-                                <p className="text-xs text-muted-foreground">Black Market&apos;in aldığı fiyat</p>
-                              </div>
-                              <div className="space-y-2">
-                                <Label>Alış Adedi</Label>
-                            {isEditing ? (
-                              <Input
-                                value={item.caerleonBlackMarket.buyQuantity ? formatNumberInput(item.caerleonBlackMarket.buyQuantity.toString()) : ''}
-                                onChange={(e) => {
-                                  const value = parseFormattedNumber(e.target.value);
-                                  updateItem(item.id, {
-                                    caerleonBlackMarket: {
-                                      ...item.caerleonBlackMarket,
-                                      buyQuantity: Math.floor(value),
-                                    },
-                                  });
-                                }}
-                                placeholder="0"
-                              />
-                              ) : (
-                                <p className="text-sm py-2">
-                                  {item.caerleonBlackMarket.buyQuantity ? formatNumber(item.caerleonBlackMarket.buyQuantity) : '0'}
-                                </p>
-                              )}
-                                <p className="text-xs text-muted-foreground">Black Market&apos;in aldığı maksimum adet</p>
-                              </div>
-                              <div className="space-y-2">
-                                <Label>Satış Adedi</Label>
-                            {isEditing ? (
-                              <Input
-                                value={item.caerleonBlackMarket.sellQuantity ? formatNumberInput(item.caerleonBlackMarket.sellQuantity.toString()) : ''}
-                                onChange={(e) => {
-                                  const value = parseFormattedNumber(e.target.value);
-                                  updateItem(item.id, {
-                                    caerleonBlackMarket: {
-                                      ...item.caerleonBlackMarket,
-                                      sellQuantity: Math.floor(value),
-                                    },
-                                  });
-                                }}
-                                placeholder="0"
-                              />
-                              ) : (
-                                <p className="text-sm py-2">
-                                  {item.caerleonBlackMarket.sellQuantity ? formatNumber(item.caerleonBlackMarket.sellQuantity) : '0'}
-                                </p>
-                              )}
-                                <p className="text-xs text-muted-foreground">Bizim Black Market&apos;e sattığımız adet</p>
-                              </div>
-                            </div>
-                            {isEditing && (
-                              <p className="text-xs text-muted-foreground">
-                                {item.caerleonBlackMarket.isSellOrder 
-                                  ? 'Sell Order: Premium Tax (%4/%8) + Setup Fee (%2.5) düşülecek'
-                                  : 'Direkt Sell: Sadece Premium Tax (%4/%8) düşülecek'}
-                              </p>
-                            )}
-                          </div>
-                          </AccordionContent>
-                        </AccordionItem>
-                      </Accordion>
-
-                      {/* Market Bilgileri */}
-                      <Accordion type="single" collapsible className="w-full">
-                        <AccordionItem value="market-info" className="border-t pt-4">
-                          <AccordionTrigger className="hover:no-underline">
-                            <Label className="text-base font-semibold">
-                              Market Bilgileri
-                            </Label>
-                          </AccordionTrigger>
-                          <AccordionContent>
-                            <div className="space-y-2 pt-4">
-                              {CITIES.filter(c => c !== 'Caerleon').map((city) => {
-                                const cityData = item.cities.find(c => c.name === city);
-
-                                return (
-                                  <Accordion key={city} type="single" collapsible className="w-full">
-                                    <AccordionItem value={city} className="border rounded p-2">
-                                      {!cityData ? (
-                                        isEditing ? (
-                                          <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => addCityToItem(item.id, city)}
-                                            className="w-full justify-start"
-                                          >
-                                            <Plus className="mr-2 h-4 w-4" />
-                                            {city}
-                                          </Button>
-                                        ) : null
-                                      ) : (
-                                        <>
-                                          <AccordionTrigger className="hover:no-underline">
-                                            <div className="flex justify-between items-center w-full pr-4">
-                                              <span className="font-medium">{city}</span>
-                                              {isEditing && (
-                                                <Button
-                                                  type="button"
-                                                  variant="ghost"
-                                                  size="sm"
-                                                  onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    removeCityFromItem(item.id, city);
-                                                  }}
-                                                >
-                                                  <X className="h-4 w-4" />
-                                                </Button>
-                                              )}
-                                            </div>
-                                          </AccordionTrigger>
-                                          <AccordionContent>
-                                            <div className="grid grid-cols-2 gap-4 pt-4">
-                                              {displayData.orderType === 'buy_order' ? (
-                                                <>
-                                                  <div className="space-y-2">
-                                                    <Label>Buy Order Fiyatı</Label>
-                                                    {isEditing ? (
-                                                      <Input
-                                                        value={cityData.buyPrice ? formatNumberInput(cityData.buyPrice.toString()) : ''}
-                                                        onChange={(e) => updateCityData(
-                                                          item.id,
-                                                          city,
-                                                          'buyPrice',
-                                                          parseFormattedNumber(e.target.value)
-                                                        )}
-                                                        placeholder="0"
-                                                      />
-                                                    ) : (
-                                                      <p className="text-sm py-2">
-                                                        {cityData.buyPrice ? formatNumber(cityData.buyPrice) : '-'}
-                                                      </p>
-                                                    )}
-                                                    <p className="text-xs text-muted-foreground">Bizim buy order oluşturduğumuz ücret</p>
-                                                  </div>
-                                                  <div className="space-y-2">
-                                                    <Label>Buy Order Adedi</Label>
-                                                    {isEditing ? (
-                                                      <Input
-                                                        value={cityData.buyQuantity ? formatNumberInput(cityData.buyQuantity.toString()) : ''}
-                                                        onChange={(e) => updateCityData(
-                                                          item.id,
-                                                          city,
-                                                          'buyQuantity',
-                                                          Math.floor(parseFormattedNumber(e.target.value))
-                                                        )}
-                                                        placeholder="0"
-                                                      />
-                                                    ) : (
-                                                      <p className="text-sm py-2">
-                                                        {cityData.buyQuantity ? formatNumber(cityData.buyQuantity) : '-'}
-                                                      </p>
-                                                    )}
-                                                    <p className="text-xs text-muted-foreground">Bizim satın almak için oluşturduğumuz toplam adet</p>
-                                                  </div>
-                                                </>
-                                              ) : (
-                                                <>
-                                                  <div className="space-y-2">
-                                                    <Label>Satış Fiyatı</Label>
-                                                    {isEditing ? (
-                                                      <Input
-                                                        value={cityData.sellPrice ? formatNumberInput(cityData.sellPrice.toString()) : ''}
-                                                        onChange={(e) => updateCityData(
-                                                          item.id,
-                                                          city,
-                                                          'sellPrice',
-                                                          parseFormattedNumber(e.target.value)
-                                                        )}
-                                                        placeholder="0"
-                                                      />
-                                                    ) : (
-                                                      <p className="text-sm py-2">
-                                                        {cityData.sellPrice ? formatNumber(cityData.sellPrice) : '-'}
-                                                      </p>
-                                                    )}
-                                                    <p className="text-xs text-muted-foreground">Bizim satın aldığımız, Market&apos;in sattığı fiyat</p>
-                                                  </div>
-                                                  <div className="space-y-2">
-                                                    <Label>Alış Adeti</Label>
-                                                    {isEditing ? (
-                                                      <Input
-                                                        value={cityData.sellQuantity ? formatNumberInput(cityData.sellQuantity.toString()) : ''}
-                                                        onChange={(e) => updateCityData(
-                                                          item.id,
-                                                          city,
-                                                          'sellQuantity',
-                                                          Math.floor(parseFormattedNumber(e.target.value))
-                                                        )}
-                                                        placeholder="0"
-                                                      />
-                                                    ) : (
-                                                      <p className="text-sm py-2">
-                                                        {cityData.sellQuantity ? formatNumber(cityData.sellQuantity) : '-'}
-                                                      </p>
-                                                    )}
-                                                    <p className="text-xs text-muted-foreground">Marketten satın aldığımız adet</p>
-                                                  </div>
-                                                </>
-                                              )}
-                                            </div>
-                                          </AccordionContent>
-                                        </>
-                                      )}
-                                    </AccordionItem>
-                                  </Accordion>
-                                );
-                              })}
-                            </div>
-                          </AccordionContent>
-                        </AccordionItem>
-                      </Accordion>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            )}
-          </CardContent>
-        </Card>
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <CardTitle>Item Detay Bilgileri</CardTitle>
+                    <CardDescription>
+                      {isEditing ? 'Itemleri düzenleyin' : 'Item bilgilerini görüntüleyin'}
+                    </CardDescription>
+                  </div>
+                  {isEditing && (
+                    <Button onClick={addItem}>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Item Ekle
+                    </Button>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <ItemsTable
+                  items={displayData.items}
+                  isEditing={isEditing}
+                  orderType={table.order_type}
+                  onUpdateItem={updateItem}
+                  onDeleteItem={deleteItem}
+                  onAddCity={addCityToItem}
+                  onRemoveCity={removeCityFromItem}
+                  onUpdateCityData={updateCityData}
+                  tierFilter={tierFilter}
+                  onTierFilterChange={setTierFilter}
+                />
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="statistics" className="space-y-8">
