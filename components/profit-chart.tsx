@@ -52,10 +52,11 @@ export function ProfitChart({ calculations }: ProfitChartProps) {
         />
         <YAxis />
         <Tooltip
-          formatter={(value: number, name: string) => {
-            if (name === 'kar') return [`${value.toLocaleString('tr-TR')}`, 'Kar'];
-            if (name === 'zarar') return [`${value.toLocaleString('tr-TR')}`, 'Zarar'];
-            return [`${value.toLocaleString('tr-TR')}`, 'Net'];
+          formatter={(value: number | undefined, name: string) => {
+            const numValue = value ?? 0;
+            if (name === 'kar') return [`${numValue.toLocaleString('tr-TR')}`, 'Kar'];
+            if (name === 'zarar') return [`${numValue.toLocaleString('tr-TR')}`, 'Zarar'];
+            return [`${numValue.toLocaleString('tr-TR')}`, 'Net'];
           }}
         />
         <Legend />
