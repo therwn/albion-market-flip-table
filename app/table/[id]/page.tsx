@@ -291,7 +291,7 @@ export default function TableDetailPage() {
 
   return (
     <main className="min-h-screen p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
+      <div className="w-full px-4 md:px-32 space-y-8">
         <div className="flex justify-between items-center">
           <div>
             <Link href="/">

@@ -9,7 +9,6 @@ import { Switch } from '@/components/ui/switch';
 import { TIERS, QUALITIES, CITIES } from '@/lib/constants';
 import { formatNumberInput, parseFormattedNumber, formatNumber } from '@/lib/format';
 import { Plus, X } from 'lucide-react';
-import { v4 as uuidv4 } from 'uuid';
 
 interface ItemsTableProps {
   items: Item[];
@@ -69,7 +68,7 @@ export function ItemsTable({
             <th className="p-2 text-left min-w-[120px]">BM Satış Adedi</th>
             <th className="p-2 text-left min-w-[100px]">BM Order Tipi</th>
             {citiesWithoutCaerleon.map((city) => (
-              <th key={city} className="p-2 text-left min-w-[150px]">
+              <th key={city} className="p-2 text-left min-w-[200px]">
                 {city}
                 {orderType === 'buy_order' ? ' (Buy)' : ' (Sell)'}
               </th>
@@ -278,8 +277,8 @@ export function ItemsTable({
                             </Button>
                           )}
                           {orderType === 'buy_order' ? (
-                            <>
-                              <div>
+                            <div className="flex gap-1">
+                              <div className="flex-1">
                                 <Label className="text-xs">Fiyat</Label>
                                 {isEditing ? (
                                   <Input
@@ -297,7 +296,7 @@ export function ItemsTable({
                                   <div className="text-xs">{cityData.buyPrice ? formatNumber(cityData.buyPrice) : '-'}</div>
                                 )}
                               </div>
-                              <div>
+                              <div className="flex-1">
                                 <Label className="text-xs">Adet</Label>
                                 {isEditing ? (
                                   <Input
@@ -315,10 +314,10 @@ export function ItemsTable({
                                   <div className="text-xs">{cityData.buyQuantity ? formatNumber(cityData.buyQuantity) : '-'}</div>
                                 )}
                               </div>
-                            </>
+                            </div>
                           ) : (
-                            <>
-                              <div>
+                            <div className="flex gap-1">
+                              <div className="flex-1">
                                 <Label className="text-xs">Fiyat</Label>
                                 {isEditing ? (
                                   <Input
@@ -336,7 +335,7 @@ export function ItemsTable({
                                   <div className="text-xs">{cityData.sellPrice ? formatNumber(cityData.sellPrice) : '-'}</div>
                                 )}
                               </div>
-                              <div>
+                              <div className="flex-1">
                                 <Label className="text-xs">Adet</Label>
                                 {isEditing ? (
                                   <Input
@@ -354,7 +353,7 @@ export function ItemsTable({
                                   <div className="text-xs">{cityData.sellQuantity ? formatNumber(cityData.sellQuantity) : '-'}</div>
                                 )}
                               </div>
-                            </>
+                            </div>
                           )}
                         </div>
                       )}

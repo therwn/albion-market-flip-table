@@ -186,7 +186,7 @@ export default function CreateTablePage() {
 
   return (
     <main className="min-h-screen p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
+      <div className="w-full px-4 md:px-32">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-bold">Yeni Tablo Oluştur</h1>
           <ThemeToggle />
