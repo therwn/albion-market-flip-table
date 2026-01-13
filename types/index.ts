@@ -38,6 +38,8 @@ export interface TableData {
   items: Item[];
   isPremium: boolean;
   orderType: OrderType;
+  startBalance?: number; // Başlangıç bakiyesi
+  endBalance?: number; // Bitiş bakiyesi
 }
 
 export interface Table {
@@ -68,6 +70,9 @@ export interface Statistics {
   mostProfitableItems: Array<{ itemName: string; profit: number }>;
   leastProfitableItems: Array<{ itemName: string; profit: number }>;
   itemCalculations: Array<ProfitCalculation>;
+  startBalance?: number;
+  endBalance?: number;
+  balanceChange?: number; // Bitiş - Başlangıç
 }
 
 export interface ProfitCalculation {

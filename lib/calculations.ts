@@ -115,7 +115,9 @@ export function calculateItemProfit(
 export function calculateTableStatistics(
   items: Item[],
   isPremium: boolean,
-  orderType: OrderType
+  orderType: OrderType,
+  startBalance?: number,
+  endBalance?: number
 ) {
   const calculations = items.map(item => calculateItemProfit(item, isPremium, orderType));
   
@@ -145,6 +147,10 @@ export function calculateTableStatistics(
     .slice(0, 10)
     .map(c => ({ itemName: c.itemName, profit: c.profit }));
   
+  const balanceChange = startBalance !== undefined && endBalance !== undefined 
+    ? endBalance - startBalance 
+    : undefined;
+
   return {
     totalProfit,
     totalLoss,
@@ -153,5 +159,8 @@ export function calculateTableStatistics(
     mostProfitableItems,
     leastProfitableItems,
     itemCalculations: calculations, // Tekli ürün bazlı hesaplamalar
+    startBalance,
+    endBalance,
+    balanceChange,
   };
 }

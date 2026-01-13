@@ -23,6 +23,8 @@ export default function CreateTablePage() {
   const [createdBy, setCreatedBy] = useState('');
   const [isPremium, setIsPremium] = useState(false);
   const [orderType, setOrderType] = useState<OrderType>('sell_order');
+  const [startBalance, setStartBalance] = useState<number>(0);
+  const [endBalance, setEndBalance] = useState<number>(0);
   const [items, setItems] = useState<Item[]>([]);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const [expandedCities, setExpandedCities] = useState<Set<string>>(new Set());
@@ -154,6 +156,8 @@ export default function CreateTablePage() {
       items,
       isPremium,
       orderType,
+      startBalance: startBalance || undefined,
+      endBalance: endBalance || undefined,
     };
 
     try {
@@ -266,6 +270,36 @@ export default function CreateTablePage() {
                       setOrderType(checked ? 'buy_order' : 'sell_order')
                     }
                   />
+                </div>
+                <div className="space-y-2 pt-2 border-t">
+                  <Label htmlFor="startBalance">Başlangıç Bakiyesi</Label>
+                  <Input
+                    id="startBalance"
+                    value={startBalance ? formatNumberInput(startBalance.toString()) : ''}
+                    onChange={(e) => {
+                      const value = parseFormattedNumber(e.target.value);
+                      setStartBalance(value);
+                    }}
+                    placeholder="0"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Günün başlangıç bakiyesi
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="endBalance">Bitiş Bakiyesi</Label>
+                  <Input
+                    id="endBalance"
+                    value={endBalance ? formatNumberInput(endBalance.toString()) : ''}
+                    onChange={(e) => {
+                      const value = parseFormattedNumber(e.target.value);
+                      setEndBalance(value);
+                    }}
+                    placeholder="0"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Günün bitiş bakiyesi
+                  </p>
                 </div>
               </CardContent>
             </Card>

@@ -254,7 +254,9 @@ export default function TableDetailPage() {
   const statistics = calculateTableStatistics(
     editedData.items,
     table.is_premium,
-    table.order_type
+    table.order_type,
+    editedData.startBalance,
+    editedData.endBalance
   );
 
   const displayData = isEditing ? editedData : table.data;
@@ -306,6 +308,7 @@ export default function TableDetailPage() {
             )}
             <p className="text-muted-foreground mt-2">
               Oluşturulma: {formatTurkeyDateReadable(table.created_at)} | 
+              Son Güncelleme: {formatTurkeyDateReadable(table.updated_at)} | 
               Versiyon: v{table.version_number}
             </p>
           </div>
@@ -385,6 +388,91 @@ export default function TableDetailPage() {
             )}
           </div>
         </div>
+
+        {/* Market Ayarları ve Bakiye Bilgileri */}
+        {isEditing && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Market Ayarları ve Bakiye</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="premium">Premium</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Premium: %4 Tax, Premiumsuz: %8 Tax
+                      </p>
+                    </div>
+                    <Switch
+                      id="premium"
+                      checked={table.is_premium}
+                      onCheckedChange={(checked) => {
+                        // Premium değişikliği için table'ı güncelle
+                        // Bu sadece görüntüleme için, gerçek güncelleme handleSave'de yapılacak
+                      }}
+                      disabled
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="orderType">Buy Order / Sell Order</Label>
+                      <p className="text-sm text-muted-foreground">
+                        {table.order_type === 'buy_order' 
+                          ? 'Buy Order: Sadece Setup Fee (%2.5)'
+                          : 'Sell Order: Tax + Setup Fee (%2.5)'}
+                      </p>
+                    </div>
+                    <Switch
+                      id="orderType"
+                      checked={table.order_type === 'buy_order'}
+                      disabled
+                    />
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="startBalance">Başlangıç Bakiyesi</Label>
+                    <Input
+                      id="startBalance"
+                      value={editedData.startBalance ? formatNumberInput(editedData.startBalance.toString()) : ''}
+                      onChange={(e) => {
+                        const value = parseFormattedNumber(e.target.value);
+                        setEditedData({
+                          ...editedData,
+                          startBalance: value || undefined,
+                        });
+                      }}
+                      placeholder="0"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Günün başlangıç bakiyesi
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="endBalance">Bitiş Bakiyesi</Label>
+                    <Input
+                      id="endBalance"
+                      value={editedData.endBalance ? formatNumberInput(editedData.endBalance.toString()) : ''}
+                      onChange={(e) => {
+                        const value = parseFormattedNumber(e.target.value);
+                        setEditedData({
+                          ...editedData,
+                          endBalance: value || undefined,
+                        });
+                      }}
+                      placeholder="0"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Günün bitiş bakiyesi
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Tabs */}
         <Tabs defaultValue="items" className="w-full">
@@ -466,6 +554,49 @@ export default function TableDetailPage() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Bakiye İstatistikleri */}
+            {(statistics.startBalance !== undefined || statistics.endBalance !== undefined) && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Başlangıç Bakiyesi</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-bold">
+                      {statistics.startBalance !== undefined ? formatCurrency(statistics.startBalance) : '-'}
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Bitiş Bakiyesi</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-bold">
+                      {statistics.endBalance !== undefined ? formatCurrency(statistics.endBalance) : '-'}
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Bakiye Değişimi</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className={`text-2xl font-bold ${statistics.balanceChange !== undefined ? (statistics.balanceChange >= 0 ? 'text-green-600' : 'text-red-600') : ''}`}>
+                      {statistics.balanceChange !== undefined 
+                        ? `${statistics.balanceChange >= 0 ? '+' : ''}${formatCurrency(statistics.balanceChange)}`
+                        : '-'}
+                    </p>
+                    {statistics.balanceChange !== undefined && statistics.startBalance !== undefined && statistics.startBalance > 0 && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {((statistics.balanceChange / statistics.startBalance) * 100).toFixed(2)}% değişim
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            )}
 
             {/* Kar/Zarar Görselleştirme */}
             <Card>
