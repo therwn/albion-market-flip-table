@@ -24,8 +24,6 @@ interface ItemsTableProps {
     field: 'buyPrice' | 'buyQuantity' | 'sellPrice' | 'sellQuantity',
     value: number
   ) => void;
-  tierFilter?: string;
-  onTierFilterChange?: (value: string) => void;
 }
 
 export function ItemsTable({
@@ -37,12 +35,7 @@ export function ItemsTable({
   onAddCity,
   onRemoveCity,
   onUpdateCityData,
-  tierFilter = '',
-  onTierFilterChange,
 }: ItemsTableProps) {
-  const filteredTiers = TIERS.filter(tier =>
-    tierFilter === '' || tier.startsWith(tierFilter)
-  );
 
   const citiesWithoutCaerleon = CITIES.filter(c => c !== 'Caerleon');
 
@@ -109,31 +102,21 @@ export function ItemsTable({
                 </td>
                 <td className="p-2">
                   {isEditing ? (
-                    <div className="space-y-1">
-                      {onTierFilterChange && (
-                        <Input
-                          placeholder="Filtrele"
-                          value={tierFilter}
-                          onChange={(e) => onTierFilterChange(e.target.value)}
-                          className="h-8 text-xs mb-1"
-                        />
-                      )}
-                      <Select
-                        value={item.tier}
-                        onValueChange={(value) => onUpdateItem(item.id, { tier: value })}
-                      >
-                        <SelectTrigger className="h-8">
-                          <SelectValue />
-                        </SelectTrigger>
+                    <Select
+                      value={item.tier}
+                      onValueChange={(value) => onUpdateItem(item.id, { tier: value })}
+                    >
+                      <SelectTrigger className="h-8">
+                        <SelectValue />
+                      </SelectTrigger>
                         <SelectContent>
-                          {filteredTiers.map((tier) => (
+                          {TIERS.map((tier) => (
                             <SelectItem key={tier} value={tier}>
                               {tier}
                             </SelectItem>
                           ))}
                         </SelectContent>
-                      </Select>
-                    </div>
+                    </Select>
                   ) : (
                     <span>{item.tier}</span>
                   )}
@@ -264,20 +247,9 @@ export function ItemsTable({
                           <span className="text-muted-foreground text-xs">-</span>
                         )
                       ) : (
-                        <div className="space-y-1">
-                          {isEditing && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => onRemoveCity(item.id, city)}
-                              className="h-6 text-xs mb-1"
-                            >
-                              <X className="h-3 w-3" />
-                            </Button>
-                          )}
+                        <div className="flex items-end gap-1">
                           {orderType === 'buy_order' ? (
-                            <div className="flex gap-1">
+                            <>
                               <div className="flex-1">
                                 <Label className="text-xs">Fiyat</Label>
                                 {isEditing ? (
@@ -314,9 +286,9 @@ export function ItemsTable({
                                   <div className="text-xs">{cityData.buyQuantity ? formatNumber(cityData.buyQuantity) : '-'}</div>
                                 )}
                               </div>
-                            </div>
+                            </>
                           ) : (
-                            <div className="flex gap-1">
+                            <>
                               <div className="flex-1">
                                 <Label className="text-xs">Fiyat</Label>
                                 {isEditing ? (
@@ -353,7 +325,18 @@ export function ItemsTable({
                                   <div className="text-xs">{cityData.sellQuantity ? formatNumber(cityData.sellQuantity) : '-'}</div>
                                 )}
                               </div>
-                            </div>
+                            </>
+                          )}
+                          {isEditing && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => onRemoveCity(item.id, city)}
+                              className="h-7 w-7 p-0 shrink-0"
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
                           )}
                         </div>
                       )}

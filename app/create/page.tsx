@@ -294,14 +294,6 @@ export default function CreateTablePage() {
                 onAddCity={addCityToItem}
                 onRemoveCity={removeCityFromItem}
                 onUpdateCityData={updateCityData}
-                tierFilter={tierFilters[Object.keys(tierFilters)[0]] || ''}
-                onTierFilterChange={(value) => {
-                  // Use first item's tier filter or create a global one
-                  const firstItemId = items.length > 0 ? items[0].id : '';
-                  if (firstItemId) {
-                    setTierFilters(prev => ({ ...prev, [firstItemId]: value }));
-                  }
-                }}
               />
             </CardContent>
           </Card>

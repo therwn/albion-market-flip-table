@@ -41,7 +41,6 @@ export default function TableDetailPage() {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState<Table['data'] | null>(null);
-  const [tierFilter, setTierFilter] = useState('');
 
   useEffect(() => {
     if (tableId) {
@@ -201,9 +200,6 @@ export default function TableDetailPage() {
   };
 
 
-  const filteredTiers = TIERS.filter(tier =>
-    tierFilter === '' || tier.startsWith(tierFilter)
-  );
 
   // Keyboard shortcuts - must be called before early returns
   useKeyboardShortcuts([
@@ -426,8 +422,6 @@ export default function TableDetailPage() {
                   onAddCity={addCityToItem}
                   onRemoveCity={removeCityFromItem}
                   onUpdateCityData={updateCityData}
-                  tierFilter={tierFilter}
-                  onTierFilterChange={setTierFilter}
                 />
               </CardContent>
             </Card>
