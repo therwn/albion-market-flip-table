@@ -70,3 +70,45 @@
     font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   }
 }
+
+@layer utilities {
+  .bg-gradient-animated {
+    background-size: 200% 200%;
+    background-image: linear-gradient(
+      -45deg,
+      hsl(var(--primary)) 0%,
+      hsl(var(--chart-1)) 25%,
+      hsl(var(--chart-2)) 50%,
+      hsl(var(--chart-3)) 75%,
+      hsl(var(--primary)) 100%
+    );
+  }
+  
+  .text-gradient {
+    background: linear-gradient(
+      to right,
+      hsl(var(--primary)),
+      hsl(var(--chart-1)),
+      hsl(var(--chart-2))
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .animate-delay-100 {
+    animation-delay: 0.1s;
+  }
+  
+  .animate-delay-200 {
+    animation-delay: 0.2s;
+  }
+  
+  .animate-delay-300 {
+    animation-delay: 0.3s;
+  }
+  
+  .animate-delay-500 {
+    animation-delay: 0.5s;
+  }
+}
