@@ -148,6 +148,39 @@ export default function TableDetailPage() {
     });
   };
 
+  const duplicateItem = (itemId: string) => {
+    if (!editedData) return;
+    const item = editedData.items.find(i => i.id === itemId);
+    if (!item) return;
+
+    const duplicatedItem: Item = {
+      ...item,
+      id: uuidv4(),
+      name: `${item.name} (Kopya)`,
+    };
+
+    const itemIndex = editedData.items.findIndex(i => i.id === itemId);
+    const newItems = [...editedData.items];
+    newItems.splice(itemIndex + 1, 0, duplicatedItem);
+
+    setEditedData({
+      ...editedData,
+      items: newItems,
+    });
+  };
+
+  const reorderItems = (startIndex: number, endIndex: number) => {
+    if (!editedData) return;
+    const newItems = Array.from(editedData.items);
+    const [removed] = newItems.splice(startIndex, 1);
+    newItems.splice(endIndex, 0, removed);
+    
+    setEditedData({
+      ...editedData,
+      items: newItems,
+    });
+  };
+
   const addCityToItem = (itemId: string, cityName: CityName) => {
     if (!editedData) return;
     const item = editedData.items.find(i => i.id === itemId);
@@ -507,6 +540,8 @@ export default function TableDetailPage() {
                   orderType={table.order_type}
                   onUpdateItem={updateItem}
                   onDeleteItem={deleteItem}
+                  onDuplicateItem={duplicateItem}
+                  onReorderItems={reorderItems}
                   onAddCity={addCityToItem}
                   onRemoveCity={removeCityFromItem}
                   onUpdateCityData={updateCityData}
