@@ -193,80 +193,83 @@ export default function CreateTablePage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Tablo Detay Bilgileri */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Tablo Detay Bilgileri</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="tableName">Tablo Adı</Label>
-                <Input
-                  id="tableName"
-                  value={tableName}
-                  onChange={(e) => setTableName(e.target.value)}
-                  placeholder="Tablo adını girin"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="createdBy">Tabloyu Oluşturan Kişi</Label>
-                <Input
-                  id="createdBy"
-                  value={createdBy}
-                  onChange={(e) => setCreatedBy(e.target.value)}
-                  placeholder="İsim girin"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Oluşturulma Tarihi ve Saati</Label>
-                <Input
-                  value={formatTurkeyDateTime(getTurkeyDateTime())}
-                  disabled
-                  className="bg-muted"
-                />
-              </div>
-            </CardContent>
-          </Card>
+          {/* Tablo Detay Bilgileri ve Market Ayarları */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Tablo Detay Bilgileri */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Tablo Detay Bilgileri</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="tableName">Tablo Adı</Label>
+                  <Input
+                    id="tableName"
+                    value={tableName}
+                    onChange={(e) => setTableName(e.target.value)}
+                    placeholder="Tablo adını girin"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="createdBy">Tabloyu Oluşturan Kişi</Label>
+                  <Input
+                    id="createdBy"
+                    value={createdBy}
+                    onChange={(e) => setCreatedBy(e.target.value)}
+                    placeholder="İsim girin"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Oluşturulma Tarihi ve Saati</Label>
+                  <Input
+                    value={formatTurkeyDateTime(getTurkeyDateTime())}
+                    disabled
+                    className="bg-muted"
+                  />
+                </div>
+              </CardContent>
+            </Card>
 
-          {/* Market Ayarları */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Market Ayarları</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="premium">Premium</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Premium: %4 Tax, Premiumsuz: %8 Tax
-                  </p>
+            {/* Market Ayarları */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Market Ayarları</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="premium">Premium</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Premium: %4 Tax, Premiumsuz: %8 Tax
+                    </p>
+                  </div>
+                  <Switch
+                    id="premium"
+                    checked={isPremium}
+                    onCheckedChange={setIsPremium}
+                  />
                 </div>
-                <Switch
-                  id="premium"
-                  checked={isPremium}
-                  onCheckedChange={setIsPremium}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="orderType">Buy Order / Sell Order</Label>
-                  <p className="text-sm text-muted-foreground">
-                    {orderType === 'buy_order' 
-                      ? 'Buy Order: Sadece Setup Fee (%2.5)'
-                      : 'Sell Order: Tax + Setup Fee (%2.5)'}
-                  </p>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="orderType">Buy Order / Sell Order</Label>
+                    <p className="text-sm text-muted-foreground">
+                      {orderType === 'buy_order' 
+                        ? 'Buy Order: Sadece Setup Fee (%2.5)'
+                        : 'Sell Order: Tax + Setup Fee (%2.5)'}
+                    </p>
+                  </div>
+                  <Switch
+                    id="orderType"
+                    checked={orderType === 'buy_order'}
+                    onCheckedChange={(checked) => 
+                      setOrderType(checked ? 'buy_order' : 'sell_order')
+                    }
+                  />
                 </div>
-                <Switch
-                  id="orderType"
-                  checked={orderType === 'buy_order'}
-                  onCheckedChange={(checked) => 
-                    setOrderType(checked ? 'buy_order' : 'sell_order')
-                  }
-                />
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
 
           {/* Item Listesi */}
           <Card>
