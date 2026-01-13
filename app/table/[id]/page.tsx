@@ -13,7 +13,7 @@ import { TIERS, QUALITIES, CITIES } from '@/lib/constants';
 import { formatTurkeyDateReadable } from '@/lib/date-utils';
 import { calculateTableStatistics } from '@/lib/calculations';
 import { formatNumberInput, parseFormattedNumber, formatCurrency, formatNumber } from '@/lib/format';
-import { Plus, X, ChevronDown, ChevronUp, Save, History, ArrowLeft } from 'lucide-react';
+import { Plus, X, ChevronDown, ChevronUp, Save, History, ArrowLeft, Download, Share2 } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import Link from 'next/link';
 import {
@@ -26,6 +26,10 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { ThemeToggle } from '@/components/theme-toggle';
+import { ProfitChart } from '@/components/profit-chart';
+import { exportTableToCSV, downloadCSV } from '@/lib/export';
+import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 
 export default function TableDetailPage() {
   const params = useParams();
@@ -225,6 +229,66 @@ export default function TableDetailPage() {
 
   const displayData = isEditing ? editedData : table.data;
 
+  // Keyboard shortcuts
+  useKeyboardShortcuts([
+    {
+      key: 'e',
+      ctrl: true,
+      action: () => {
+        if (!isEditing) {
+          setIsEditing(true);
+        }
+      },
+      description: 'Düzenleme modunu aç/kapat',
+    },
+    {
+      key: 's',
+      ctrl: true,
+      action: () => {
+        if (isEditing) {
+          handleSave();
+        }
+      },
+      description: 'Kaydet',
+    },
+    {
+      key: 'Escape',
+      action: () => {
+        if (isEditing) {
+          setEditedData(table.data);
+          setIsEditing(false);
+        }
+      },
+      description: 'Düzenlemeyi iptal et',
+    },
+  ]);
+
+  // Export to CSV
+  const handleExportCSV = () => {
+    if (!table || !statistics) return;
+    const csvContent = exportTableToCSV(table, statistics.itemCalculations);
+    const filename = `${table.table_name || 'tablo'}-${new Date().toISOString().split('T')[0]}.csv`;
+    downloadCSV(csvContent, filename);
+  };
+
+  // Share table
+  const handleShare = async () => {
+    const shareUrl = `${window.location.origin}/table/${tableId}/share`;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      alert('Paylaşım linki kopyalandı!');
+    } catch (err) {
+      // Fallback for browsers that don't support clipboard API
+      const textArea = document.createElement('textarea');
+      textArea.value = shareUrl;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('Paylaşım linki kopyalandı!');
+    }
+  };
+
   return (
     <main className="min-h-screen p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -249,7 +313,24 @@ export default function TableDetailPage() {
               Versiyon: v{table.version_number}
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Button
+              variant="outline"
+              onClick={handleExportCSV}
+              title="CSV olarak dışa aktar (Ctrl+E)"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              CSV Export
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleShare}
+              title="Paylaşım linkini kopyala"
+            >
+              <Share2 className="mr-2 h-4 w-4" />
+              Paylaş
+            </Button>
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="outline">
@@ -755,6 +836,25 @@ export default function TableDetailPage() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Kar/Zarar Görselleştirme */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Item Bazlı Kar/Zarar Görselleştirme</CardTitle>
+                <CardDescription>
+                  Her item için kar/zarar grafik görünümü
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {statistics.itemCalculations.length > 0 ? (
+                  <ProfitChart calculations={statistics.itemCalculations} />
+                ) : (
+                  <p className="text-center text-muted-foreground py-8">
+                    Görselleştirme için item ekleyin.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
 
             {/* Ürün Bazlı Kar/Zarar Detayları */}
             <Card>

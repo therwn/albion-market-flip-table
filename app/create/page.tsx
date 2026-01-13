@@ -13,6 +13,7 @@ import { TIERS, QUALITIES, CITIES } from '@/lib/constants';
 import { getTurkeyDateTime, formatTurkeyDateTime } from '@/lib/date-utils';
 import { formatNumberInput, parseFormattedNumber } from '@/lib/format';
 import { Plus, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { v4 as uuidv4 } from 'uuid';
 
 export default function CreateTablePage() {
@@ -185,7 +186,10 @@ export default function CreateTablePage() {
   return (
     <main className="min-h-screen p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8">Yeni Tablo Oluştur</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-bold">Yeni Tablo Oluştur</h1>
+          <ThemeToggle />
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Tablo Detay Bilgileri */}

@@ -8,6 +8,7 @@ import { Table } from '@/types';
 import { formatTurkeyDateReadable } from '@/lib/date-utils';
 import { formatCurrency } from '@/lib/format';
 import { Plus, ArrowRight, Edit, Trash2 } from 'lucide-react';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 interface Statistics {
   mostSoldItems: Array<{ itemName: string; quantity: number }>;
@@ -76,12 +77,15 @@ export default function Home() {
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-bold">Albion Online Market Flip Table</h1>
-          <Link href="/create">
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Tablo Oluştur
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Link href="/create">
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Tablo Oluştur
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* İstatistikler */}
