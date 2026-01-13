@@ -81,8 +81,8 @@ export default function Home() {
       <div className="relative z-10 p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
           {/* Hero Section */}
-          <div className="relative mb-16 pt-8 pb-12">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
+          <div className="relative mb-8 pt-6 pb-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-6">
               <div className="space-y-4 animate-fade-in-up">
                 <div className="flex items-center gap-3">
                   <div className="p-3 rounded-xl bg-gradient-to-br from-primary to-chart-1 shadow-lg animate-float">
@@ -99,7 +99,9 @@ export default function Home() {
                 </p>
               </div>
               <div className="flex items-center gap-3 animate-slide-in-right">
-                <ThemeToggle />
+                <div className="h-11">
+                  <ThemeToggle />
+                </div>
                 <Link href="/create">
                   <Button size="lg" className="bg-gradient-to-r from-primary to-chart-1 hover:from-primary/90 hover:to-chart-1/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                     <Plus className="mr-2 h-5 w-5" />
@@ -113,7 +115,7 @@ export default function Home() {
 
           {/* İstatistikler */}
           {!statsLoading && statistics && (
-            <div className="mb-16 space-y-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <div className="mb-12 space-y-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
               <div className="flex items-center gap-3 mb-6">
                 <BarChart3 className="h-6 w-6 text-primary" />
                 <h2 className="text-3xl font-bold">Genel İstatistikler</h2>
