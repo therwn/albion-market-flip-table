@@ -437,6 +437,9 @@ export function ItemsTable({
     })
   );
 
+  // Disable drag when not editing
+  const effectiveSensors = isEditing ? sensors : [];
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     console.log('Drag ended:', { active: active.id, over: over?.id });
@@ -475,10 +478,9 @@ export function ItemsTable({
   return (
     <div className="overflow-x-auto">
       <DndContext
-        sensors={sensors}
+        sensors={effectiveSensors}
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
-        disabled={!isEditing}
       >
         <table className="w-full border-collapse">
           <thead>
