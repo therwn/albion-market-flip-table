@@ -107,7 +107,7 @@ function SortableRow({
     <tr
       ref={setNodeRef}
       style={style}
-      className={`border-b ${tierBgColor || ''} ${isDragging ? 'z-50 opacity-50' : 'hover:bg-muted/50'}`}
+      className={`border-b ${tierBgColor || ''} ${isDragging ? 'z-50 opacity-50' : ''} transition-colors`}
     >
       {isEditing && (
         <td className="p-2">
@@ -121,22 +121,28 @@ function SortableRow({
             >
               <GripVertical className="h-4 w-4 text-muted-foreground pointer-events-none" />
             </button>
-            {onDuplicateItem && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => onDuplicateItem(item.id)}
-                title="Kopyala"
-              >
-                <Copy className="h-4 w-4" />
-              </Button>
-            )}
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onDuplicateItem) {
+                  onDuplicateItem(item.id);
+                }
+              }}
+              title="Kopyala"
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
             <Button
               type="button"
               variant="destructive"
               size="icon"
-              onClick={() => onDeleteItem(item.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onDeleteItem(item.id);
+              }}
               title="Sil"
             >
               <X className="h-4 w-4" />
@@ -477,11 +483,11 @@ export function ItemsTable({
               ))}
             </tr>
           </thead>
-          <tbody>
-            <SortableContext
-              items={items.map((item) => item.id)}
-              strategy={verticalListSortingStrategy}
-            >
+          <SortableContext
+            items={items.map((item) => item.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <tbody>
               {items.map((item, index) => (
                 <SortableRow
                   key={item.id}
@@ -498,8 +504,8 @@ export function ItemsTable({
                   onUpdateCityData={onUpdateCityData}
                 />
               ))}
-            </SortableContext>
-          </tbody>
+            </tbody>
+          </SortableContext>
         </table>
       </DndContext>
     </div>
