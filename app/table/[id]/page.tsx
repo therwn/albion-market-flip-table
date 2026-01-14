@@ -170,24 +170,32 @@ export default function TableDetailPage() {
     newItems.splice(itemIndex + 1, 0, duplicatedItem);
 
     console.log('Item duplicated, new items count:', newItems.length);
-    setEditedData({
+    console.log('Setting new editedData with items:', newItems.map(i => i.name));
+    
+    const newEditedData = {
       ...editedData,
       items: newItems,
-    });
+    };
+    
+    setEditedData(newEditedData);
   };
 
   const reorderItems = (startIndex: number, endIndex: number) => {
     if (!editedData) return;
     console.log('Reordering items:', { startIndex, endIndex });
-    const newItems = Array.from(editedData.items);
+    const newItems = [...editedData.items];
     const [removed] = newItems.splice(startIndex, 1);
     newItems.splice(endIndex, 0, removed);
     
     console.log('New order:', newItems.map(i => i.name));
-    setEditedData({
+    console.log('Setting new editedData');
+    
+    const newEditedData = {
       ...editedData,
       items: newItems,
-    });
+    };
+    
+    setEditedData(newEditedData);
   };
 
   const addCityToItem = (itemId: string, cityName: CityName) => {
@@ -301,7 +309,7 @@ export default function TableDetailPage() {
     editedData.endBalance
   );
 
-  const displayData = isEditing ? editedData : table.data;
+  const displayData = isEditing && editedData ? editedData : table.data;
 
   // Export to CSV
   const handleExportCSV = () => {
@@ -473,7 +481,7 @@ export default function TableDetailPage() {
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="startBalance">Başlangıç Bakiyesi</Label>
                     <Input
@@ -543,6 +551,11 @@ export default function TableDetailPage() {
                 </div>
               </CardHeader>
               <CardContent>
+                {isEditing && editedData && (
+                  <div className="mb-4 p-2 bg-muted rounded text-xs">
+                    Debug: {editedData.items.length} items in state
+                  </div>
+                )}
                 <ItemsTable
                   items={displayData.items}
                   isEditing={isEditing}
