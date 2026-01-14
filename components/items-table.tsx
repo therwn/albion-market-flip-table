@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { Item, CityName, ItemQuality, OrderType } from '@/types';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -92,17 +93,21 @@ function SortableRow({
     opacity: isDragging ? 0.5 : 1,
   };
 
-  const cityDataMap = new Map(
-    item.cities.map(city => [city.name, city])
+  const cityDataMap = useMemo(
+    () => new Map(item.cities.map(city => [city.name, city])),
+    [item.cities]
   );
 
-  const tierBgColor = getTierBackgroundColor(item.tier);
+  const tierBgColor = useMemo(
+    () => getTierBackgroundColor(item.tier),
+    [item.tier]
+  );
 
   return (
     <tr
       ref={setNodeRef}
       style={style}
-      className={`border-b ${tierBgColor} ${isDragging ? 'z-50 opacity-50' : 'hover:bg-muted/50'}`}
+      className={`border-b ${tierBgColor || ''} ${isDragging ? 'z-50 opacity-50' : 'hover:bg-muted/50'}`}
     >
       {isEditing && (
         <td className="p-2">
@@ -426,10 +431,15 @@ export function ItemsTable({
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (over && active.id !== over.id && onReorderItems) {
+    if (!over || !onReorderItems) return;
+    
+    if (active.id !== over.id) {
       const oldIndex = items.findIndex((item) => item.id === active.id);
       const newIndex = items.findIndex((item) => item.id === over.id);
-      onReorderItems(oldIndex, newIndex);
+      
+      if (oldIndex !== -1 && newIndex !== -1) {
+        onReorderItems(oldIndex, newIndex);
+      }
     }
   };
 

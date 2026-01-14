@@ -464,44 +464,42 @@ export default function TableDetailPage() {
                     />
                   </div>
                 </div>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="startBalance">Başlangıç Bakiyesi</Label>
-                      <Input
-                        id="startBalance"
-                        value={editedData.startBalance ? formatNumberInput(editedData.startBalance.toString()) : ''}
-                        onChange={(e) => {
-                          const value = parseFormattedNumber(e.target.value);
-                          setEditedData({
-                            ...editedData,
-                            startBalance: value || undefined,
-                          });
-                        }}
-                        placeholder="0"
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Günün başlangıç bakiyesi
-                      </p>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="endBalance">Bitiş Bakiyesi</Label>
-                      <Input
-                        id="endBalance"
-                        value={editedData.endBalance ? formatNumberInput(editedData.endBalance.toString()) : ''}
-                        onChange={(e) => {
-                          const value = parseFormattedNumber(e.target.value);
-                          setEditedData({
-                            ...editedData,
-                            endBalance: value || undefined,
-                          });
-                        }}
-                        placeholder="0"
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Günün bitiş bakiyesi
-                      </p>
-                    </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="startBalance">Başlangıç Bakiyesi</Label>
+                    <Input
+                      id="startBalance"
+                      value={editedData.startBalance ? formatNumberInput(editedData.startBalance.toString()) : ''}
+                      onChange={(e) => {
+                        const value = parseFormattedNumber(e.target.value);
+                        setEditedData({
+                          ...editedData,
+                          startBalance: value || undefined,
+                        });
+                      }}
+                      placeholder="0"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Günün başlangıç bakiyesi
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="endBalance">Bitiş Bakiyesi</Label>
+                    <Input
+                      id="endBalance"
+                      value={editedData.endBalance ? formatNumberInput(editedData.endBalance.toString()) : ''}
+                      onChange={(e) => {
+                        const value = parseFormattedNumber(e.target.value);
+                        setEditedData({
+                          ...editedData,
+                          endBalance: value || undefined,
+                        });
+                      }}
+                      placeholder="0"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Günün bitiş bakiyesi
+                    </p>
                   </div>
                 </div>
               </div>
