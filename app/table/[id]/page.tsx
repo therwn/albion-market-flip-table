@@ -150,19 +150,26 @@ export default function TableDetailPage() {
 
   const duplicateItem = (itemId: string) => {
     if (!editedData) return;
+    console.log('Duplicating item:', itemId);
     const item = editedData.items.find(i => i.id === itemId);
-    if (!item) return;
+    if (!item) {
+      console.log('Item not found');
+      return;
+    }
 
     const duplicatedItem: Item = {
       ...item,
       id: uuidv4(),
       name: `${item.name} (Kopya)`,
+      cities: item.cities.map(city => ({ ...city })),
+      caerleonBlackMarket: { ...item.caerleonBlackMarket },
     };
 
     const itemIndex = editedData.items.findIndex(i => i.id === itemId);
     const newItems = [...editedData.items];
     newItems.splice(itemIndex + 1, 0, duplicatedItem);
 
+    console.log('Item duplicated, new items count:', newItems.length);
     setEditedData({
       ...editedData,
       items: newItems,
@@ -171,10 +178,12 @@ export default function TableDetailPage() {
 
   const reorderItems = (startIndex: number, endIndex: number) => {
     if (!editedData) return;
+    console.log('Reordering items:', { startIndex, endIndex });
     const newItems = Array.from(editedData.items);
     const [removed] = newItems.splice(startIndex, 1);
     newItems.splice(endIndex, 0, removed);
     
+    console.log('New order:', newItems.map(i => i.name));
     setEditedData({
       ...editedData,
       items: newItems,
@@ -464,7 +473,7 @@ export default function TableDetailPage() {
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="startBalance">Başlangıç Bakiyesi</Label>
                     <Input
