@@ -71,6 +71,50 @@ export default function CreateTablePage() {
     });
   };
 
+  const duplicateItem = (itemId: string) => {
+    setItems((prevItems) => {
+      const itemIndex = prevItems.findIndex((i) => i.id === itemId);
+      if (itemIndex === -1) return prevItems;
+
+      const item = prevItems[itemIndex];
+      const duplicatedId = uuidv4();
+
+      const duplicatedItem: Item = {
+        ...item,
+        id: duplicatedId,
+        name: `${item.name} (Kopya)`,
+        cities: item.cities.map((city) => ({ ...city })),
+        caerleonBlackMarket: { ...item.caerleonBlackMarket },
+      };
+
+      const next = [...prevItems];
+      next.splice(itemIndex + 1, 0, duplicatedItem);
+
+      // (Optional) Keep expanded state for the duplicated item
+      setExpandedItems((prev) => new Set([...prev, duplicatedId]));
+
+      return next;
+    });
+  };
+
+  const reorderItems = (startIndex: number, endIndex: number) => {
+    setItems((prevItems) => {
+      if (
+        startIndex < 0 ||
+        endIndex < 0 ||
+        startIndex >= prevItems.length ||
+        endIndex >= prevItems.length
+      ) {
+        return prevItems;
+      }
+
+      const next = [...prevItems];
+      const [removed] = next.splice(startIndex, 1);
+      next.splice(endIndex, 0, removed);
+      return next;
+    });
+  };
+
   const toggleItemExpansion = (itemId: string) => {
     setExpandedItems(prev => {
       const newSet = new Set(prev);
@@ -271,35 +315,39 @@ export default function CreateTablePage() {
                     }
                   />
                 </div>
-                <div className="space-y-2 pt-2 border-t">
-                  <Label htmlFor="startBalance">Başlangıç Bakiyesi</Label>
-                  <Input
-                    id="startBalance"
-                    value={startBalance ? formatNumberInput(startBalance.toString()) : ''}
-                    onChange={(e) => {
-                      const value = parseFormattedNumber(e.target.value);
-                      setStartBalance(value);
-                    }}
-                    placeholder="0"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Günün başlangıç bakiyesi
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="endBalance">Bitiş Bakiyesi</Label>
-                  <Input
-                    id="endBalance"
-                    value={endBalance ? formatNumberInput(endBalance.toString()) : ''}
-                    onChange={(e) => {
-                      const value = parseFormattedNumber(e.target.value);
-                      setEndBalance(value);
-                    }}
-                    placeholder="0"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Günün bitiş bakiyesi
-                  </p>
+                <div className="pt-2 border-t">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="startBalance">Başlangıç Bakiyesi</Label>
+                      <Input
+                        id="startBalance"
+                        value={startBalance ? formatNumberInput(startBalance.toString()) : ''}
+                        onChange={(e) => {
+                          const value = parseFormattedNumber(e.target.value);
+                          setStartBalance(value);
+                        }}
+                        placeholder="0"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Günün başlangıç bakiyesi
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="endBalance">Bitiş Bakiyesi</Label>
+                      <Input
+                        id="endBalance"
+                        value={endBalance ? formatNumberInput(endBalance.toString()) : ''}
+                        onChange={(e) => {
+                          const value = parseFormattedNumber(e.target.value);
+                          setEndBalance(value);
+                        }}
+                        placeholder="0"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Günün bitiş bakiyesi
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -328,6 +376,8 @@ export default function CreateTablePage() {
                 orderType={orderType}
                 onUpdateItem={updateItem}
                 onDeleteItem={deleteItem}
+                onDuplicateItem={duplicateItem}
+                onReorderItems={reorderItems}
                 onAddCity={addCityToItem}
                 onRemoveCity={removeCityFromItem}
                 onUpdateCityData={updateCityData}

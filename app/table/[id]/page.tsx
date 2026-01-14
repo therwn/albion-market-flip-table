@@ -150,12 +150,8 @@ export default function TableDetailPage() {
 
   const duplicateItem = (itemId: string) => {
     if (!editedData) return;
-    console.log('Duplicating item:', itemId);
     const item = editedData.items.find(i => i.id === itemId);
-    if (!item) {
-      console.log('Item not found');
-      return;
-    }
+    if (!item) return;
 
     const duplicatedItem: Item = {
       ...item,
@@ -168,9 +164,6 @@ export default function TableDetailPage() {
     const itemIndex = editedData.items.findIndex(i => i.id === itemId);
     const newItems = [...editedData.items];
     newItems.splice(itemIndex + 1, 0, duplicatedItem);
-
-    console.log('Item duplicated, new items count:', newItems.length);
-    console.log('Setting new editedData with items:', newItems.map(i => i.name));
     
     const newEditedData = {
       ...editedData,
@@ -182,13 +175,9 @@ export default function TableDetailPage() {
 
   const reorderItems = (startIndex: number, endIndex: number) => {
     if (!editedData) return;
-    console.log('Reordering items:', { startIndex, endIndex });
     const newItems = [...editedData.items];
     const [removed] = newItems.splice(startIndex, 1);
     newItems.splice(endIndex, 0, removed);
-    
-    console.log('New order:', newItems.map(i => i.name));
-    console.log('Setting new editedData');
     
     const newEditedData = {
       ...editedData,
@@ -551,11 +540,6 @@ export default function TableDetailPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                {isEditing && editedData && (
-                  <div className="mb-4 p-2 bg-muted rounded text-xs">
-                    Debug: {editedData.items.length} items in state
-                  </div>
-                )}
                 <ItemsTable
                   items={displayData.items}
                   isEditing={isEditing}
