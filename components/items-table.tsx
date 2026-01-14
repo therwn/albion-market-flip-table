@@ -127,8 +127,11 @@ function SortableRow({
               size="icon"
               onClick={(e) => {
                 e.stopPropagation();
+                console.log('Duplicate button clicked', item.id);
                 if (onDuplicateItem) {
                   onDuplicateItem(item.id);
+                } else {
+                  console.log('No onDuplicateItem function');
                 }
               }}
               title="Kopyala"
@@ -436,15 +439,27 @@ export function ItemsTable({
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    console.log('Drag ended:', { active: active.id, over: over?.id });
 
-    if (!over || !onReorderItems) return;
+    if (!over) {
+      console.log('No over element');
+      return;
+    }
+    
+    if (!onReorderItems) {
+      console.log('No onReorderItems function');
+      return;
+    }
     
     if (active.id !== over.id) {
       const oldIndex = items.findIndex((item) => item.id === active.id);
       const newIndex = items.findIndex((item) => item.id === over.id);
+      console.log('Calling onReorderItems with:', { oldIndex, newIndex });
       
       if (oldIndex !== -1 && newIndex !== -1) {
         onReorderItems(oldIndex, newIndex);
+      } else {
+        console.log('Invalid indices:', { oldIndex, newIndex });
       }
     }
   };
@@ -463,6 +478,7 @@ export function ItemsTable({
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
+        disabled={!isEditing}
       >
         <table className="w-full border-collapse">
           <thead>
