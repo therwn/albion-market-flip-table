@@ -102,7 +102,7 @@ function SortableRow({
     <tr
       ref={setNodeRef}
       style={style}
-      className={`border-b hover:bg-muted/50 ${tierBgColor} ${isDragging ? 'z-50' : ''}`}
+      className={`border-b ${tierBgColor} ${isDragging ? 'z-50 opacity-50' : 'hover:bg-muted/50'}`}
     >
       {isEditing && (
         <td className="p-2">
@@ -110,10 +110,11 @@ function SortableRow({
             <button
               {...attributes}
               {...listeners}
-              className="cursor-grab active:cursor-grabbing p-1 hover:bg-muted rounded"
+              className="cursor-grab active:cursor-grabbing p-1 hover:bg-muted rounded touch-none"
               title="Sürükle"
+              type="button"
             >
-              <GripVertical className="h-4 w-4 text-muted-foreground" />
+              <GripVertical className="h-4 w-4 text-muted-foreground pointer-events-none" />
             </button>
             {onDuplicateItem && (
               <Button
@@ -412,7 +413,11 @@ export function ItemsTable({
   const citiesWithoutCaerleon = CITIES.filter(c => c !== 'Caerleon');
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 8px hareket ettikten sonra drag başlasın
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
